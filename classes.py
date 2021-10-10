@@ -1,88 +1,87 @@
+
 from functions import get_normalized_vector, vector2angles, angles2vector
 from math import sqrt, pi, sin, cos, atan2
+from utils import *
 
 
 class UAV:
 
-    def __init__(self, position, velocity, radio, direction, goal_point):
-        self.position = position
-        self.velocity = velocity
+    def __init__(self, position, speed, radio, direction, goal_point, goal_distance=1):
+        self.position = np.array(position)
+        self.velocity = np.array(velocity)
         self.radio = radio
-        self.direction = get_normalized_vector(direction)
-        self.goal_point = goal_point
+        self.direction = np.array((get_normalized_vector(direction))
+        self.goal_point = np.array(goal_point)
+        self.is_in_goal = False
 
-    def position_after_t(self, time):
+    def fly(self, timestep):
+        new_pos = self.position + timestep*speed*self.direction
 
-        px, py, pz = self.position
-        vx, vy, vz = self.direction
-        return (px + self.velocity*time*vx, py + self.velocity*time*vy, pz + self.velocity*time*vz)
+        ## Distance from P3 to line between P1 and P2
+        p1, p2, p3 = new_pos, self.position, self.goal_point
+        d = distance_from_line_2point(p1, p2, p3)
+        if d <= goal_distance:
+            self.is_in_goal = True
+        
+        self.position = new_pos
 
-    # los rangos son los valores que limitan el desvio, o sea, el UAV solo podra tomar desde d-range/2 hasta d+range/2
-    # k es el paso que en cada rango salta
-    def generate_directions_by_vector_ranges(self, Xrange, Yrange, Zrange, k):
 
-        Xstep, Ystep, Zstep = Xrange / k, Yrange / k, Zrange / k
-        x, y, z = self.direction
-        directions = []
-        for i in range(k):
-            for j in range(k):
-                for k in range(k):
-                    d = (x - Xrange/2 + i * Xstep, y - Yrange/2 + j * Ystep, z - Zrange/2 + k * Zstep)
-                    if d != (0,0,0):
-                        directions.append(get_normalized_vector(d))
+    def generate_directions(self, k, max_amp=randians(30)):
 
-        directions.append(self.direction)
-        return directions
-
-    # los rangos se dan en radianes para los planos phi -> XY, theta -> eje Z
-    def generate_directions_by_span_angles(self, span_phi_range, span_theta_range, k):
-        phi ,theta, _ = vector2angles(self.direction)
-        n = int(sqrt(k))
-
-        directions = []
-        for i in range(n+1):
-            for j in range(n+1):
-                if i and j:
-                    directions.append(angles2vector((phi - span_phi_range/2 + i*span_phi_range/(n+1)) % (2*pi),
-                                                    (theta - span_theta_range/2 + j*span_theta_range/(n+1)) % (2*pi)))
-
-        directions.append(self.direction)
-        return directions
-
-    # los rangos se dan en radianes para los planos phi -> XY, theta -> eje Z
-    def generate_directions2D(self, span_theta_range, k):
-        theta, _, _ = vector2angles(self.direction)
-
-        directions = []
+        d = []
+        amp = 2*max_amp/k
+        currentamp, _ = vector_2angles(self.direction)
         for i in range(k+1):
-            if i:
-                if not k%2 and i == int((k+1)/2)+1:
-                    directions.append(self.direction)
-                theta_i = (theta - span_theta_range/2 + i*span_theta_range/(k+1)) % (2 * pi)
-                directions.append((cos(theta_i), sin(theta_i), 0))
+            newamp = -max_amp + amp*i
+            if newamp>0 and k%2==0:
+                d.append(self.direction)
 
-        directions.sort(key = lambda x: atan2(x[1],x[0])%(2*pi))
-        return directions
+            d.append(angles_2vector(currentamp+newamp))
+        
+        return d
+         
 
-    def get_optimal_direction(self):
-        X1, Y1, Z1 = self.goal_point
-        X2, Y2, Z2 = self.position
-        return get_normalized_vector((X1-X2, Y1-Y2, Z1-Z2))
+    # def position_after_t(self, time):
+
+    #     px, py, pz = self.position
+    #     vx, vy, vz = self.direction
+    #     return (px + self.velocity*time*vx, py + self.velocity*time*vy, pz + self.velocity*time*vz)
+
+
+    # # los rangos se dan en radianes para los planos phi -> XY, theta -> eje Z
+    # def generate_directions2D(self, span_theta_range, k):
+    #     theta, _, _ = vector2angles(self.direction)
+
+    #     directions = []
+    #     for i in range(k+1):
+    #         if i:
+    #             if not k%2 and i == int((k+1)/2)+1:
+    #                 directions.append(self.direction)
+    #             theta_i = (theta - span_theta_range/2 + i*span_theta_range/(k+1)) % (2 * pi)
+    #             directions.append((cos(theta_i), sin(theta_i), 0))
+
+    #     directions.sort(key = lambda x: atan2(x[1],x[0])%(2*pi))
+    #     return directions
+
+    # def get_optimal_direction(self):
+    #     X1, Y1, Z1 = self.goal_point
+    #     X2, Y2, Z2 = self.position
+    #     return get_normalized_vector((X1-X2, Y1-Y2, Z1-Z2))
     
-    def generate_directions3D(self, span_phi_range, span_theta_range, k):
-        phi, theta, _ = vector2angles(self.direction)
+    # def generate_directions3D(self, span_phi_range, span_theta_range, k):
+    #     phi, theta, _ = vector2angles(self.direction)
 
-        directions = []
-        k = int(sqrt(k))
-        for i in range(k):
-            for j in range(k):
-                phi_i = (phi - span_phi_range + 2 * i * span_phi_range / k + span_phi_range / k) % (2 * pi)
-                theta_j = (theta - span_theta_range + 2 * j * span_theta_range / k + span_theta_range / k) % (2 * pi)
-                directions.append(angles2vector(phi_i, theta_j))
+    #     directions = []
+    #     k = int(sqrt(k))
+    #     for i in range(k):
+    #         for j in range(k):
+    #             phi_i = (phi - span_phi_range + 2 * i * span_phi_range / k + span_phi_range / k) % (2 * pi)
+    #             theta_j = (theta - span_theta_range + 2 * j * span_theta_range / k + span_theta_range / k) % (2 * pi)
+    #             directions.append(angles2vector(phi_i, theta_j))
 
-                v1 = self.get_optimal_direction()
-                v2 = angles2vector(phi_i, theta_j)
-        return directions + [self.get_optimal_direction()]
+    #             v1 = self.get_optimal_direction()
+    #             v2 = angles2vector(phi_i, theta_j)
+    #     return directions + [self.get_optimal_direction()]
 
 
 
@@ -99,6 +98,8 @@ class Region:
         px, py, pz = self.init_point
         x, y, z = point
         return (px <= x <= px + self.width) and (py <= y <= py + self.width) and (pz <= z <= pz + self.width)
+
+
 
 if __name__ == "__main__":
 
