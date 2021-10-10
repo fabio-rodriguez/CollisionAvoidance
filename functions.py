@@ -1,4 +1,5 @@
-from math import sqrt, atan2, pi, sin, cos, acos
+from math import *
+
 
 def vectors_distance_by_components(vector1, vector2):
     return sqrt(sum([(x-y)**2 for x,y in zip(vector1, vector2)]))
