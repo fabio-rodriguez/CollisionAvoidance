@@ -13,9 +13,9 @@ def test_experiment():
     u3 = UAV((0, 10), 1, 1.5, (0, -1), (0, -10))
     u4 = UAV((0, -10), 1, 1.5, (0, 1), (0, 10))
 
-    r = simulate([u1, u2, u3, u4], 10, 6, 0.5)
+    measures = simulate([u1, u2, u3, u4], 10, 6, 0.5)
+    print(measures)
 
-    print(r)
     plot_history([u1, u2, u3, u4])
 
 
@@ -36,8 +36,9 @@ def experiment1(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange=0.8):
         uav = UAV(position, speed, radio, direction, goal, goal_distance=0.01)
         uavs.append(uav)
     
-    r = simulate(uavs, k, ca_timerange, timestep)
-    print(r)
+    measures = simulate(uavs, k, ca_timerange, timestep)
+    print(measures)
+
     plot_history(uavs)
 
 
@@ -64,6 +65,6 @@ def experiment6():
 
 if __name__ == "__main__":
 
-    # test_experiment()
+    test_experiment()
 
-    experiment1()
+    # experiment1()

@@ -4,8 +4,9 @@ from utils import *
 
 class UAV:
 
-    def __init__(self, position, speed, radio, direction, goal_point, goal_distance=1, max_amp=radians(60)):
+    def __init__(self, position, speed, radio, direction, goal_point, goal_distance=1, max_amp=radians(30)):
         self.position = np.array(position)
+        self.initial_position = np.array(position)
         self.speed = speed
         self.radio = radio
         self.direction = np.array(get_normalized_vector(direction))
@@ -13,6 +14,7 @@ class UAV:
         self.is_in_goal = False
         self.max_amp = max_amp
         self.history = [self.position]
+        ## Minimum distance to reach the goal
         self.goal_distance = goal_distance
 
     def fly(self, timestep):
@@ -42,9 +44,9 @@ class UAV:
             newamp = -self.max_amp + amp*i
             if aux and newamp>0 and k%2==0:
                 aux = False
-                d.append(self.direction)
+                d.append((self.direction, 0))
 
-            d.append(get_normalized_vector(angles_2vector(currentamp+newamp)))
+            d.append((get_normalized_vector(angles_2vector(currentamp+newamp)), abs(amp*(i-int(k/2)))))
         
         return d
 
@@ -55,10 +57,4 @@ if __name__ == "__main__":
 
     uav = UAV((1,1,0), 1, 1, (1,0,0), (20,0,0))
 
-
-    # angles = [vector2angles(v) for v in uav.generate_directions_by_span_angles(pi/2, pi/2, 25)]
-    # angles = [(degrees(a1), degrees(a2)) for a1, a2, _ in angles]
-    # print(angles)
-
-    # print(uav.get_optimal_direction())
 

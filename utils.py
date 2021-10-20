@@ -11,6 +11,12 @@ def distance_from_line_2point(p1, p2, p3):
     return norm(np.cross(p2-p1, p1-p3)) / den
 
 
+def collinear(p0, p1, p2, epsilon=1e-12):
+    x1, y1 = p1[0] - p0[0], p1[1] - p0[1]
+    x2, y2 = p2[0] - p0[0], p2[1] - p0[1]
+    return abs(x1 * y2 - x2 * y1) < epsilon
+
+
 # Detect if uav1 with direction d1 collides with uav2 with direction d2
 def collide(uav1, d1, uav2, d2, timestep):
     ## The first must be the slower
@@ -67,3 +73,15 @@ def plot_history(uavs):
     
     plt.show()
 
+
+def calc_measures(uav):
+    # La longitud de la trayectoria
+    longitude = sum([euclidian_distance(point, uav.history[i+1]) for i, point in enumerate(uav.history) if i<len(uav.history)-1])
+
+    # La desviación que era la real menos la optima
+    deviation = longitude - euclidian_distance(uav.initial_position, uav.goal_point)
+
+    # el número de giros tambien
+    number_of_turns = sum([1 for i, point in enumerate(uav.history) if i<len(uav.history)-2 and collinear(point, uav.history[i+1], uav.history[i+2])])
+
+    return {"longitude": longitude, "deviation": deviation, "number_of_turns": number_of_turns}
