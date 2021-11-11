@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 from classes import UAV
 from utils import get_normalized_vector, plot_history
@@ -62,6 +63,48 @@ def experiment6():
     pass
 
 
+def random_experiments(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange=0.8):
+    
+    cwd = os.getcwd()
+
+    allfiles = [f for f in os.listdir(cwd) if os.path.isfile(os.path.join(cwd, f)) if f.endswith(".txt")]
+    
+    for file in allfiles[:3]:
+        with open(f'{cwd}/{file}', 'r') as f:
+            print(f.readline())
+
+            drone_positions = []
+            for _ in range(5):
+                line = f.readline().split()
+                x = float(line[0]) 
+                y = float(line[1])
+
+                drone_positions.append((x,y))
+
+            print(f.readline())
+            
+            goal_positions = []
+            for _ in range(5):
+                line = f.readline().split()
+                x = float(line[0]) 
+                y = float(line[1])
+
+                goal_positions.append((x,y))
+
+        uavs = []
+        for position, goal in zip(drone_positions, goal_positions):
+            direction = get_normalized_vector(np.array(goal)-np.array(position))
+            uav = UAV(position, speed, radio, direction, goal, goal_distance=0.01)
+            uavs.append(uav)
+        
+        measures = simulate(uavs, k, ca_timerange, timestep)
+        print(measures)
+
+        plot_history(uavs)
+
+            
+
+        
 
 if __name__ == "__main__":
 
