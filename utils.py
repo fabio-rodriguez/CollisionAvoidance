@@ -65,13 +65,14 @@ def vector_norm(vector):
     return sqrt(vector[0]**2 + vector[1]**2)
 
 
-def plot_history(uavs):
+def plot_history(uavs, name="default"):
 
     for uav in uavs:
         X, Y = zip(*uav.history) 
         plt.plot(X, Y, '.-')
     
-    plt.show()
+    # plt.show()
+    plt.savefig(f"{name}.jpg")
 
 
 def calc_measures(uav):

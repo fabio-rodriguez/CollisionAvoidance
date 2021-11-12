@@ -67,40 +67,46 @@ def random_experiments(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange
     
     cwd = os.getcwd()
 
-    allfiles = [f for f in os.listdir(cwd) if os.path.isfile(os.path.join(cwd, f)) if f.endswith(".txt")]
+    path_to_data = f'{cwd}/data'
+    allfiles = [f for f in os.listdir(path_to_data) if os.path.isfile(os.path.join(path_to_data, f)) if f.endswith(".txt")]
     
     for file in allfiles[:3]:
-        with open(f'{cwd}/{file}', 'r') as f:
-            print(f.readline())
+        print(file)
+        with open(f'{path_to_data}/{file}', 'r') as f:
+            f.readline()
 
             drone_positions = []
-            for _ in range(5):
+            for _ in range(6):
                 line = f.readline().split()
+                print(line)
                 x = float(line[0]) 
                 y = float(line[1])
 
                 drone_positions.append((x,y))
 
-            print(f.readline())
+            f.readline()
+            f.readline()
             
             goal_positions = []
-            for _ in range(5):
+            for _ in range(6):
                 line = f.readline().split()
+                print(line)
                 x = float(line[0]) 
                 y = float(line[1])
 
                 goal_positions.append((x,y))
 
         uavs = []
+        print()
         for position, goal in zip(drone_positions, goal_positions):
+            print(position, goal)
             direction = get_normalized_vector(np.array(goal)-np.array(position))
             uav = UAV(position, speed, radio, direction, goal, goal_distance=0.01)
             uavs.append(uav)
         
         measures = simulate(uavs, k, ca_timerange, timestep)
-        print(measures)
-
-        plot_history(uavs)
+        
+        plot_history(uavs, file)
 
             
 
@@ -108,6 +114,8 @@ def random_experiments(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange
 
 if __name__ == "__main__":
 
-    test_experiment()
+    # test_experiment()
 
     # experiment1()
+
+    random_experiments()
