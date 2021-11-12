@@ -1,3 +1,4 @@
+import json
 import numpy as np
 import os
 
@@ -67,24 +68,25 @@ def random_experiments(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange
     
     cwd = os.getcwd()
 
-    allfiles = [f for f in os.listdir(cwd) if os.path.isfile(os.path.join(cwd, f)) if f.endswith(".txt")]
-    
-    for file in allfiles[:3]:
-        with open(f'{cwd}/{file}', 'r') as f:
-            print(f.readline())
+    allfiles = [f for f in os.listdir(f'{cwd}/data') if os.path.isfile(os.path.join(f'{cwd}/data', f)) if f.endswith(".txt")]
+    results = {}
+    for file in allfiles:
+        with open(f'{cwd}/data/{file}', 'r') as f:
+            f.readline()
 
             drone_positions = []
-            for _ in range(5):
+            for _ in range(6):
                 line = f.readline().split()
                 x = float(line[0]) 
                 y = float(line[1])
 
                 drone_positions.append((x,y))
 
-            print(f.readline())
+            f.readline()
+            f.readline()
             
             goal_positions = []
-            for _ in range(5):
+            for _ in range(6):
                 line = f.readline().split()
                 x = float(line[0]) 
                 y = float(line[1])
@@ -98,9 +100,12 @@ def random_experiments(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange
             uavs.append(uav)
         
         measures = simulate(uavs, k, ca_timerange, timestep)
-        print(measures)
+        results[file] = measures
 
-        plot_history(uavs)
+        plot_history(uavs[:-1])
+    
+    with open("random_results.json", "w") as f:
+        f.write(json.dumps(results))
 
             
 
@@ -108,6 +113,8 @@ def random_experiments(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange
 
 if __name__ == "__main__":
 
-    test_experiment()
+    # test_experiment()
 
     # experiment1()
+
+    random_experiments()
