@@ -58,6 +58,8 @@ def experiment2(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange=0.8):
     
     measures = simulate(uavs, k, ca_timerange, timestep)
     print(measures)
+    with open("experiments2.json", "w") as f:
+        f.write(json.dumps(measures))
 
     plot_history(uavs)
 
@@ -76,6 +78,8 @@ def experiment3(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange=0.8):
     
     measures = simulate(uavs, k, ca_timerange, timestep)
     print(measures)
+    with open("experiments3.json", "w") as f:
+        f.write(json.dumps(measures))
 
     plot_history(uavs)
 
