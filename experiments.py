@@ -44,24 +44,40 @@ def experiment1(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange=0.8):
     plot_history(uavs)
 
 
-def experiment2():
-    pass
+def experiment2(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange=0.8):
+    ''' 5 drones down to up'''
 
+    drone_positions = [(-8, -8), (-4, -8), (0, -8), (4, -8), (8, -8)]    
+    goals = [(8, 8), (4, 8), (-4, 8), (-8, 8), (0, 8)]
 
-def experiment3():
-    pass
-
+    uavs = []
+    for position, goal in zip(drone_positions, goals):
+        direction = get_normalized_vector(np.array(goal)-np.array(position))
+        uav = UAV(position, speed, radio, direction, goal, goal_distance=0.01)
+        uavs.append(uav)
     
-def experiment4():
-    pass
+    measures = simulate(uavs, k, ca_timerange, timestep)
+    print(measures)
 
+    plot_history(uavs)
+
+
+def experiment3(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange=0.8):
+    '6agentes_esc4'
+
+    drone_positions = [(0, 0), (10, 0), (15, 2), (15, -2), (20, 4), (20, -4)]    
+    goals = [(40, 0), (0, 0), (0, -2), (0, 2), (0, -4), (0, 4)]
+
+    uavs = []
+    for position, goal in zip(drone_positions, goals):
+        direction = get_normalized_vector(np.array(goal)-np.array(position))
+        uav = UAV(position, speed, radio, direction, goal, goal_distance=0.01)
+        uavs.append(uav)
     
-def experiment5():
-    pass
+    measures = simulate(uavs, k, ca_timerange, timestep)
+    print(measures)
 
-
-def experiment6():
-    pass
+    plot_history(uavs)
 
 
 def random_experiments(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange=0.8):
@@ -110,12 +126,14 @@ def random_experiments(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange
 
             
 
-        
-
 if __name__ == "__main__":
 
     # test_experiment()
 
     # experiment1()
 
-    random_experiments()
+    experiment2()
+
+    experiment3()
+
+    # random_experiments()
