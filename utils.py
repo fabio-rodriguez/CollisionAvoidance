@@ -73,6 +73,7 @@ def plot_history(uavs, name="default"):
     
     # plt.show()
     plt.savefig(f"{name}.jpg")
+    plt.close()
 
 
 def calc_measures(uav):

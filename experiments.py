@@ -77,7 +77,6 @@ def random_experiments(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange
             drone_positions = []
             for _ in range(6):
                 line = f.readline().split()
-                print(line)
                 x = float(line[0]) 
                 y = float(line[1])
 
@@ -89,16 +88,13 @@ def random_experiments(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange
             goal_positions = []
             for _ in range(6):
                 line = f.readline().split()
-                print(line)
                 x = float(line[0]) 
                 y = float(line[1])
 
                 goal_positions.append((x,y))
 
         uavs = []
-        print()
         for position, goal in zip(drone_positions, goal_positions):
-            print(position, goal)
             direction = get_normalized_vector(np.array(goal)-np.array(position))
             uav = UAV(position, speed, radio, direction, goal, goal_distance=0.01)
             uavs.append(uav)
@@ -107,7 +103,7 @@ def random_experiments(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange
 
         results[file] = measures
 
-        plot_history(uavs[:-1], file)
+        plot_history(uavs[:-1], f'data/{file[:-4]}')
     
     with open("random_results.json", "w") as f:
         f.write(json.dumps(results))
