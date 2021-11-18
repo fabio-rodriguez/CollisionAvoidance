@@ -44,7 +44,7 @@ def experiment1(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange=0.8):
     plot_history(uavs)
 
 
-def experiment2(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange=0.8):
+def experiment2(k=10, speed = 1, radio = 0.2, timestep=0.5, ca_timerange=5):
     ''' 5 drones down to up'''
 
     drone_positions = [(-8, -8), (-4, -8), (0, -8), (4, -8), (8, -8)]    
@@ -61,10 +61,10 @@ def experiment2(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange=0.8):
     with open("experiments2.json", "w") as f:
         f.write(json.dumps(measures))
 
-    plot_history(uavs)
+    plot_history(uavs, name="experiments2")
 
 
-def experiment3(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange=0.8):
+def experiment3(k=10, speed = 1, radio = 0.2, timestep=0.5, ca_timerange=5):
     '6agentes_esc4'
 
     drone_positions = [(0, 0), (10, 0), (15, 2), (15, -2), (20, 4), (20, -4)]    
@@ -81,10 +81,10 @@ def experiment3(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange=0.8):
     with open("experiments3.json", "w") as f:
         f.write(json.dumps(measures))
 
-    plot_history(uavs)
+    plot_history(uavs, name="experiments3")
 
 
-def random_experiments(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange=0.8):
+def random_experiments(k=10, speed = 1, radio = 0.25, timestep=0.1, ca_timerange=1):
     
     cwd = os.getcwd()
 
@@ -140,4 +140,4 @@ if __name__ == "__main__":
 
     experiment3()
 
-    # random_experiments()
+    random_experiments()
