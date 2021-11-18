@@ -108,9 +108,6 @@ def random_experiments(k=10, speed = 1, radio = 0.1, timestep=0.05, ca_timerange
         f.write(json.dumps(results))
 
             
-
-        
-
 if __name__ == "__main__":
 
     # test_experiment()

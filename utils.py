@@ -69,7 +69,7 @@ def plot_history(uavs):
 
     for uav in uavs:
         X, Y = zip(*uav.history) 
-        plt.plot(X, Y, '.-')
+        plt.plot(X, Y, '.')
     
     plt.show()
 
