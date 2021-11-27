@@ -11,7 +11,7 @@ def distance_from_line_2point(p1, p2, p3):
     return norm(np.cross(p2-p1, p1-p3)) / den
 
 
-def collinear(p0, p1, p2, epsilon=1e-12):
+def collinear(p0, p1, p2, epsilon=1e-8):
     x1, y1 = p1[0] - p0[0], p1[1] - p0[1]
     x2, y2 = p2[0] - p0[0], p2[1] - p0[1]
     return abs(x1 * y2 - x2 * y1) < epsilon
@@ -65,13 +65,15 @@ def vector_norm(vector):
     return sqrt(vector[0]**2 + vector[1]**2)
 
 
-def plot_history(uavs):
+def plot_history(uavs, name="default"):
 
     for uav in uavs:
         X, Y = zip(*uav.history) 
         plt.plot(X, Y, '.')
     
-    plt.show()
+    # plt.show()
+    plt.savefig(f"{name}.jpg")
+    plt.close()
 
 
 def calc_measures(uav):
@@ -82,6 +84,6 @@ def calc_measures(uav):
     deviation = longitude - euclidian_distance(uav.initial_position, uav.goal_point)
 
     # el número de giros tambien
-    number_of_turns = sum([1 for i, point in enumerate(uav.history) if i<len(uav.history)-2 and collinear(point, uav.history[i+1], uav.history[i+2])])
+    number_of_turns = sum([1 for i, point in enumerate(uav.history) if i<len(uav.history)-2 and not collinear(point, uav.history[i+1], uav.history[i+2])])
 
     return {"longitude": longitude, "deviation": deviation, "number_of_turns": number_of_turns}
