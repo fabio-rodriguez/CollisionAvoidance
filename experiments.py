@@ -21,7 +21,7 @@ def test_experiment():
     plot_history([u1, u2, u3, u4])
 
 
-def experiment1(k=10, speed = 1, radio = 1.5, timestep=0.25, ca_timerange=5):
+def experiment1(k=10, speed = 1, radio = 1.5, timestep=0.25, ca_timerange=10):
     ''' 6 drones antipodales'''
 
     drone_positions = []
@@ -39,13 +39,13 @@ def experiment1(k=10, speed = 1, radio = 1.5, timestep=0.25, ca_timerange=5):
         uavs.append(uav)
     
     measures = simulate(uavs, k, ca_timerange, timestep)
-    with open("experiments1.json", "w") as f:
+    with open("results/experiments1.json", "w") as f:
         f.write(json.dumps(measures))
 
-    plot_history(uavs, name="experiments1")
+    plot_history(uavs, name="results/experiments1")
 
 
-def experiment2(k=10, speed = 1, radio = 1.5, timestep=0.25, ca_timerange=5):
+def experiment2(k=10, speed = 1, radio = 1.5, timestep=0.25, ca_timerange=10):
     ''' 5 drones down to up'''
 
     drone_positions = [(-8, -8), (-4, -8), (0, -8), (4, -8), (8, -8)]    
@@ -59,13 +59,13 @@ def experiment2(k=10, speed = 1, radio = 1.5, timestep=0.25, ca_timerange=5):
     
     measures = simulate(uavs, k, ca_timerange, timestep)
     print(measures)
-    with open("experiments2.json", "w") as f:
+    with open("results/experiments2.json", "w") as f:
         f.write(json.dumps(measures))
 
-    plot_history(uavs, name="experiments2")
+    plot_history(uavs, name="results/experiments2")
 
 
-def experiment3(k=10, speed = 1, radio = 1.5, timestep=0.25, ca_timerange=5):
+def experiment3(k=10, speed = 1, radio = 1.5, timestep=0.25, ca_timerange=10):
     '6agentes_esc4'
 
     drone_positions = [(0, 0), (10, 0), (15, 2), (15, -2), (20, 4), (20, -4)]    
@@ -79,13 +79,13 @@ def experiment3(k=10, speed = 1, radio = 1.5, timestep=0.25, ca_timerange=5):
     
     measures = simulate(uavs, k, ca_timerange, timestep)
     print(measures)
-    with open("experiments3.json", "w") as f:
+    with open("results/experiments3.json", "w") as f:
         f.write(json.dumps(measures))
 
-    plot_history(uavs, name="experiments3")
+    plot_history(uavs, name="results/experiments3")
 
 
-def experiment4(k=10, speed = 1, radio = 1.5, timestep=0.25, ca_timerange=5):
+def experiment4(k=10, speed = 1, radio = 1.5, timestep=0.25, ca_timerange=10):
     ''' 5 drones antipodal alternando '''
     
     drone_positions = []    
@@ -93,7 +93,7 @@ def experiment4(k=10, speed = 1, radio = 1.5, timestep=0.25, ca_timerange=5):
     
     for i in range(10):
         if i == 0 or i%2 ==0:
-            position = ( 10*cos(*2*pi/10), 10*sin(i*2*pi/10) )
+            position = ( 10*cos(i*2*pi/10), 10*sin(i*2*pi/10) )
             drone_positions.append(position)
             
             goals.append((-position[0], -position[1]))
@@ -106,20 +106,24 @@ def experiment4(k=10, speed = 1, radio = 1.5, timestep=0.25, ca_timerange=5):
     
     measures = simulate(uavs, k, ca_timerange, timestep)
     print(measures)
-    with open("experiments4.json", "w") as f:
+    with open("results/experiments4.json", "w") as f:
         f.write(json.dumps(measures))
 
-    plot_history(uavs, name="experiments4")
+    plot_history(uavs, name="results/experiments4")
 
 
-def random_experiments(k=10, speed = 1, radio = 1.5, timestep=0.25, ca_timerange=5):
+def random_experiments(k=6, speed = 1, radio = 1.5, timestep=0.1, ca_timerange=15, max_amp=radians(45)):
     
     cwd = os.getcwd()
+
+    f = open("results/random_results.json", "w")
+    f.close()
 
     allfiles = [f for f in os.listdir(f'{cwd}/data') if os.path.isfile(os.path.join(f'{cwd}/data', f)) if f.endswith(".txt")]
     results = {}
     for file in allfiles:
         with open(f'{cwd}/data/{file}', 'r') as f:
+            print(f"- Experiment File {file}")
             f.readline()
 
             drone_positions = []
@@ -141,19 +145,26 @@ def random_experiments(k=10, speed = 1, radio = 1.5, timestep=0.25, ca_timerange
 
                 goal_positions.append((x,y))
 
+        drone_positions.pop(-1)
+        goal_positions.pop(-1)
+
         uavs = []
         for position, goal in zip(drone_positions, goal_positions):
             direction = get_normalized_vector(np.array(goal)-np.array(position))
-            uav = UAV(position, speed, radio, direction, goal, goal_distance=1)
+            uav = UAV(position, speed, radio, direction, goal, goal_distance=1, max_amp=max_amp)
             uavs.append(uav)
         
         measures = simulate(uavs, k, ca_timerange, timestep)
+
+        with open("results/random_results.txt", "a") as f:
+            f.write(str(measures))
+            f.write("\n")
 
         results[file] = measures
 
         plot_history(uavs[:-1], f'data/{file[:-4]}')
     
-    with open("random_results.json", "w") as f:
+    with open("results/random_results.json", "w") as f:
         f.write(json.dumps(results))
 
             
@@ -161,25 +172,25 @@ if __name__ == "__main__":
 
     # test_experiment()
 
-    experiment1()
+    # experiment1()
 
-    print("****Experimento 1 terminado****")
-    print()
+    # print("****Experimento 1 terminado****")
+    # print()
 
-    experiment2()
+    # experiment2()
 
-    print("****Experimento 2 terminado****")
-    print()
+    # print("****Experimento 2 terminado****")
+    # print()
     
-    experiment3()
+    # experiment3()
 
-    print("****Experimento 3 terminado****")
-    print()
+    # print("****Experimento 3 terminado****")
+    # print()
     
-    experiment4()
+    # experiment4()
 
-    print("****Experimento 4 terminado****")
-    print()
+    # print("****Experimento 4 terminado****")
+    # print()
 
     random_experiments()
     

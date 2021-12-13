@@ -67,10 +67,14 @@ def vector_norm(vector):
 
 def plot_history(uavs, name="default"):
 
-    for uav in uavs:
+    colors = ["r", "y", "b", "g", "m"]
+    for uav, color in zip(uavs, colors):
         X, Y = zip(*uav.history) 
-        plt.plot(X, Y, '.')
+        plt.plot(X, Y, '-'+color)
     
+        plt.plot([X[0]], [Y[0]], "^"+color)
+        plt.plot([uav.goal_point[0]], [uav.goal_point[1]], "x"+color)
+
     # plt.show()
     plt.savefig(f"{name}.jpg")
     plt.close()

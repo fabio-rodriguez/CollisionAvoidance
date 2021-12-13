@@ -4,7 +4,7 @@ from utils import *
 
 class UAV:
 
-    def __init__(self, position, speed, radio, direction, goal_point, goal_distance=1, max_amp=radians(30)):
+    def __init__(self, position, speed, radio, direction, goal_point, goal_distance=1, max_amp=radians(45)):
         self.position = np.array(position)
         self.initial_position = np.array(position)
         self.speed = speed
@@ -47,6 +47,9 @@ class UAV:
                 d.append((self.direction, 0))
 
             d.append((get_normalized_vector(angles_2vector(currentamp+newamp)), abs(amp*(i-int(k/2)))))
+        
+        d.append((self.direction, amp))
+        d.append((np.array([0,0]), 2*amp*k))
         
         return d
 
