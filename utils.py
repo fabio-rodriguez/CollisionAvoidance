@@ -21,6 +21,7 @@ def collinear(p0, p1, p2, epsilon=1e-8):
 def collide(uav1, d1, uav2, d2, timestep):
     ## The first must be the slower
     uav1, d1, uav2, d2 = (uav1, d1, uav2, d2) if uav1.speed < uav2.speed else (uav2, d2, uav1, d1)
+    # print(d2*uav2.speed, d1*uav1.speed)
     diffvector = d2*uav2.speed - d1*uav1.speed
     p2 = uav2.position + diffvector
     cat1 = distance_from_line_2point(uav2.position, p2, uav1.position) 
@@ -81,6 +82,7 @@ def plot_history(uavs, name="default"):
 
 
 def calc_measures(uav):
+    
     # La longitud de la trayectoria
     longitude = sum([euclidian_distance(point, uav.history[i+1]) for i, point in enumerate(uav.history) if i<len(uav.history)-1])
 
@@ -90,4 +92,24 @@ def calc_measures(uav):
     # el número de giros tambien
     number_of_turns = sum([1 for i, point in enumerate(uav.history) if i<len(uav.history)-2 and not collinear(point, uav.history[i+1], uav.history[i+2])])
 
-    return {"longitude": longitude, "deviation": deviation, "number_of_turns": number_of_turns}
+    # Energy measures
+    # m1
+    flight_time = longitude/uav.speed
+    # m2
+    # velocity_variation = sum([sqrt(uav.history[i].speed**2 - uav.history[i+1].speed**2) for i, point in enumerate(uav.history) if i<len(uav.history)-1])
+    velocity_variation = 0
+    # m3
+    m3 = number_of_turns
+    # m4
+    d = lambda p1, p2, p3: asin(distance_from_line_2point(p1, p2, p3)/euclidian_distance(p2,p3))
+    angles_sum = sum([abs(d(point, uav.history[i+1], uav.history[i+2])) for i, point in enumerate(uav.history) if i<len(uav.history)-2 and not collinear(point, uav.history[i+1], uav.history[i+2])])
+
+    return {
+        "longitude": longitude, 
+        "deviation": deviation, 
+        "number_of_turns": number_of_turns, 
+        "m1": flight_time, 
+        "m2": velocity_variation,
+        "m3": m3,
+        "m4": angles_sum
+    }

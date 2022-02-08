@@ -4,7 +4,7 @@ from utils import *
 from solver import resolve_collision 
 
 
-def simulate(uavs, k, ca_timerange, timestep, max_iterations=10000):
+def simulate(uavs, k, ca_timerange, timestep, max_iterations=10**5):
 
     flying_uavs = uavs[:]
     count = 0

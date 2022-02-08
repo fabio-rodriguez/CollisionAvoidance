@@ -48,7 +48,7 @@ class UAV:
 
             d.append((get_normalized_vector(angles_2vector(currentamp+newamp)), abs(amp*(i-int(k/2)))))
         
-        d.append((self.direction, amp))
+        d.append((self.direction, abs(amp)))
         d.append((np.array([0,0]), 2*amp*k))
         
         return d
