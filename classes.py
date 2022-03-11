@@ -35,21 +35,32 @@ class UAV:
 
 
     def generate_directions(self, k):
+        
+        # goal_dir = get_normalized_vector(self.goal_point - self.position)
+
+        # d = []
+        # amp = 2*self.max_amp/k
+        # currentamp, _ = vector_2angles(self.direction)
+
+        # for i in range(k+1):
+        #     newamp = -self.max_amp + amp*i
+        #     dir = get_normalized_vector(angles_2vector(currentamp+newamp))
+        #     d.append((dir, euclidian_distance(dir, goal_dir)))
+        
+        # d.append((self.direction, euclidian_distance(self.direction, goal_dir)))
+        
+        goal_dir = get_normalized_vector(self.goal_point - self.position)
 
         d = []
         amp = 2*self.max_amp/k
         currentamp, _ = vector_2angles(self.direction)
-        aux = True
         for i in range(k+1):
             newamp = -self.max_amp + amp*i
-            if aux and newamp>0 and k%2==0:
-                aux = False
-                d.append((self.direction, 0))
-
-            d.append((get_normalized_vector(angles_2vector(currentamp+newamp)), abs(amp*(i-int(k/2)))))
+            newdir = get_normalized_vector(angles_2vector(currentamp+newamp))
+            d.append((newdir, euclidian_distance(newdir, goal_dir)))
         
-        d.append((self.direction, abs(amp)))
-        d.append((np.array([0,0]), 2*amp*k))
+        if k%2==0:
+            d.append((goal_dir, 0))
         
         return d
 
@@ -58,6 +69,9 @@ if __name__ == "__main__":
 
     from math import atan2, degrees
 
-    uav = UAV((1,1,0), 1, 1, (1,0,0), (20,0,0))
+    uav = UAV((-4.26866144, 11.6145004),1,0.5,(-0.71826272, -0.695772),(-8,8),max_amp=radians(60))
+
+    print(uav)
+    print(uav.generate_directions(5))
 
 

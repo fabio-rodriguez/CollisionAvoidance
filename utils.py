@@ -68,7 +68,7 @@ def vector_norm(vector):
 
 def plot_history(uavs, name="default"):
 
-    colors = ["r", "y", "b", "g", "m"]
+    colors = ["r", "y", "b", "g", "m", "k"]
     for uav, color in zip(uavs, colors):
         X, Y = zip(*uav.history) 
         plt.plot(X, Y, '-'+color)
@@ -76,7 +76,7 @@ def plot_history(uavs, name="default"):
         plt.plot([X[0]], [Y[0]], "^"+color)
         plt.plot([uav.goal_point[0]], [uav.goal_point[1]], "x"+color)
 
-    # plt.show()
+    plt.show()
     plt.savefig(f"{name}.jpg")
     plt.close()
 
@@ -101,9 +101,9 @@ def calc_measures(uav):
     # m3
     m3 = number_of_turns
     # m4
-    d = lambda p1, p2, p3: asin(distance_from_line_2point(p1, p2, p3)/euclidian_distance(p2,p3))
-    angles_sum = sum([abs(d(point, uav.history[i+1], uav.history[i+2])) for i, point in enumerate(uav.history) if i<len(uav.history)-2 and not collinear(point, uav.history[i+1], uav.history[i+2])])
-
+    # d = lambda p1, p2, p3: asin(distance_from_line_2point(p1, p2, p3)/euclidian_distance(p2,p3))
+    # angles_sum = sum([abs(d(point, uav.history[i+1], uav.history[i+2])) for i, point in enumerate(uav.history) if i<len(uav.history)-2 and not collinear(point, uav.history[i+1], uav.history[i+2])])
+    angles_sum=0
     return {
         "longitude": longitude, 
         "deviation": deviation, 
