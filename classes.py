@@ -59,8 +59,8 @@ class UAV:
             newdir = get_normalized_vector(angles_2vector(currentamp+newamp))
             d.append((newdir, euclidian_distance(newdir, goal_dir)))
         
-        if k%2==0:
-            d.append((goal_dir, 0))
+        if k%2!=0:
+            d.append((self.direction, euclidian_distance(self.direction, goal_dir)))
         
         return d
 
@@ -69,6 +69,12 @@ if __name__ == "__main__":
 
     from math import atan2, degrees
 
+    #  [(array([0.94341668, 0.33160966]), 0.04702048877028444), 
+    # (array([0.72697622, 0.68666264]), 0.36971546811559025), 
+    # (array([0.38483497, 0.9229854 ]), 0.7702930849531653), 
+    # (array([-0.02384775,  0.9997156 ]), 1.1372051977019704), 
+    # (array([-0.42840697,  0.9035859 ]), 1.454415986395225), 
+    # (array([-0.75889073,  0.65121798]), 1.7080618174207913)]
     uav = UAV((-4.26866144, 11.6145004),1,0.5,(-0.71826272, -0.695772),(-8,8),max_amp=radians(60))
 
     print(uav)

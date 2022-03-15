@@ -21,7 +21,7 @@ def test_experiment():
     plot_history([u1, u2, u3, u4])
 
 
-def experiment1(k=5, speed = 1, radio = 0.5, timestep=1, ca_timerange=10):
+def experiment1(k=6, speed = 1, radio = 0.5, timestep=1, ca_timerange=10):
     ''' 6 drones antipodales'''
 
     drone_positions = []
@@ -35,7 +35,7 @@ def experiment1(k=5, speed = 1, radio = 0.5, timestep=1, ca_timerange=10):
     uavs = []
     for position, goal in zip(drone_positions, goals):
         direction = get_normalized_vector(np.array(goal)-np.array(position))
-        uav = UAV(position, speed, radio, direction, goal, goal_distance=0.5, max_amp=radians(45))
+        uav = UAV(position, speed, radio, direction, goal, goal_distance=0.5, max_amp=radians(90))
         uavs.append(uav)
     
     measures = simulate(uavs, k, ca_timerange, timestep)
@@ -79,7 +79,6 @@ def experiment3(k=5, speed = 1, radio = 0.5, timestep=1, ca_timerange=10):
         uavs.append(uav)
     
     measures = simulate(uavs, k, ca_timerange, timestep)
-    print(measures)
     with open("results/experiments3.json", "w") as f:
         f.write(json.dumps(measures))
 
@@ -184,20 +183,20 @@ if __name__ == "__main__":
     print("****Experimento 1 terminado****")
     print()
 
-    experiment2()
+    # experiment2()
 
-    print("****Experimento 2 terminado****")
-    print()
+    # print("****Experimento 2 terminado****")
+    # print()
     
-    experiment3()
+    # experiment3()
 
-    print("****Experimento 3 terminado****")
-    print()
+    # print("****Experimento 3 terminado****")
+    # print()
     
-    experiment4()
+    # experiment4()
 
-    print("****Experimento 4 terminado****")
-    print()
+    # print("****Experimento 4 terminado****")
+    # print()
 
     # random_experiments()
     

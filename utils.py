@@ -17,6 +17,13 @@ def collinear(p0, p1, p2, epsilon=1e-8):
     return abs(x1 * y2 - x2 * y1) < epsilon
 
 
+def deviation_angle(p0, p1, p2, epsilon=1e-8):
+    cat = distance_from_line_2point(p0, p1, p2)
+    hip = euclidian_distance(p1, p2)
+    return asin(cat/hip)
+
+
+
 # Detect if uav1 with direction d1 collides with uav2 with direction d2
 def collide(uav1, d1, uav2, d2, timestep):
     ## The first must be the slower
@@ -28,7 +35,11 @@ def collide(uav1, d1, uav2, d2, timestep):
     
     if cat1 < (uav1.radio + uav2.radio):
         hip = euclidian_distance(uav1.position, uav2.position)
-        cat2 = sqrt(hip**2 - cat1**2)
+        try:
+            cat2 = sqrt(hip**2 - cat1**2)
+        except:
+            cat2 = 0
+
         return cat2 < vector_norm(diffvector)*timestep
     
     return False
@@ -90,7 +101,11 @@ def calc_measures(uav):
     deviation = longitude - euclidian_distance(uav.initial_position, uav.goal_point)
 
     # el número de giros tambien
-    number_of_turns = sum([1 for i, point in enumerate(uav.history) if i<len(uav.history)-2 and not collinear(point, uav.history[i+1], uav.history[i+2])])
+    turns = sum([deviation_angle() for i, point in enumerate(uav.history) if i<len(uav.history)-2 and not collinear(point, uav.history[i+1], uav.history[i+2])])
+    number_of_turns = sum(turns)
+
+    # el maximo giro tambien
+    max_turn = max(turns)
 
     # Energy measures
     # m1
@@ -108,6 +123,7 @@ def calc_measures(uav):
         "longitude": longitude, 
         "deviation": deviation, 
         "number_of_turns": number_of_turns, 
+        "max_turn": max_turn, 
         "m1": flight_time, 
         "m2": velocity_variation,
         "m3": m3,
