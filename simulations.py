@@ -50,8 +50,8 @@ def simulate(uavs, k, ca_timerange, timestep, max_iterations=10**5):
 
     measures = {i: calc_measures(uav) for i, uav in enumerate(uavs)}
     measures["waypoints"] = {i: {
-        "X": [point[0] for point in uav.history],
-        "Y": [point[1] for point in uav.history]
+        "X": [float(point[0]) for point in uav.history],
+        "Y": [float(point[1]) for point in uav.history]
         } for i, uav in enumerate(uavs)}
     measures["total_time"] = tf
     measures["min_cost"] = min_cost

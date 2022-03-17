@@ -20,7 +20,13 @@ def collinear(p0, p1, p2, epsilon=1e-8):
 def deviation_angle(p0, p1, p2, epsilon=1e-8):
     cat = distance_from_line_2point(p0, p1, p2)
     hip = euclidian_distance(p1, p2)
-    return asin(cat/hip)
+    try:
+        return abs(asin(cat/hip))
+    except:
+        print("******* ASIN ERROR *******")
+        print(cat, hip)
+        print()
+        return abs(asin(1))
 
 
 
@@ -79,16 +85,17 @@ def vector_norm(vector):
 
 def plot_history(uavs, name="default"):
 
+
     colors = ["r", "y", "b", "g", "m", "k"]
     for uav, color in zip(uavs, colors):
         X, Y = zip(*uav.history) 
         plt.plot(X, Y, '-'+color)
-    
         plt.plot([X[0]], [Y[0]], "^"+color)
         plt.plot([uav.goal_point[0]], [uav.goal_point[1]], "x"+color)
 
-    plt.show()
+
     plt.savefig(f"{name}.jpg")
+    # plt.show()
     plt.close()
 
 
@@ -101,11 +108,14 @@ def calc_measures(uav):
     deviation = longitude - euclidian_distance(uav.initial_position, uav.goal_point)
 
     # el número de giros tambien
-    turns = sum([deviation_angle() for i, point in enumerate(uav.history) if i<len(uav.history)-2 and not collinear(point, uav.history[i+1], uav.history[i+2])])
+    turns = [deviation_angle(point, uav.history[i+1], uav.history[i+2]) for i, point in enumerate(uav.history) if i<len(uav.history)-2 and not collinear(point, uav.history[i+1], uav.history[i+2])]
     number_of_turns = sum(turns)
 
     # el maximo giro tambien
-    max_turn = max(turns)
+    if turns:
+        max_turn = max(turns)
+    else:
+        max_turn = 0
 
     # Energy measures
     # m1

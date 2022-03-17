@@ -28,8 +28,8 @@ def solve_brute_force_recursive(uavs, directions_list, timestep, index, result, 
             optimal_result, optimal_dev_cost, optimal_total_cost = solve_brute_force_recursive(uavs, directions_list, timestep, index+1, result, new_dev_cost, total_cost)
 
             if optimal_result != None and \
-                (dev_cost == None or optimal_dev_cost <= dev_cost) and \
-                (total_cost == None or optimal_total_cost <= total_cost):
+                (dev_cost == None or optimal_dev_cost <= dev_cost): # and \
+                # (total_cost == None or optimal_total_cost <= total_cost):
                     opt = optimal_result[:]
                     dev_cost = optimal_dev_cost
                     total_cost = optimal_total_cost
@@ -66,8 +66,8 @@ def solve_brute_force_recursive2(uavs, directions_list, timestep, index, result)
                 continue
 
             new_cost = cost + c
-            if opt_cost == None or new_cost < opt_cost or \
-                (new_cost == opt_cost and random.uniform(0, 1) < 0.5):
+            if opt_cost == None or new_cost < opt_cost:#  or \
+                # (new_cost == opt_cost and random.uniform(0, 1) < 0.5):
                     opt = optimal_result[:]
                     opt_cost = new_cost
     

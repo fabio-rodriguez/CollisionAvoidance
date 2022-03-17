@@ -36,19 +36,8 @@ class UAV:
 
     def generate_directions(self, k):
         
-        # goal_dir = get_normalized_vector(self.goal_point - self.position)
-
-        # d = []
-        # amp = 2*self.max_amp/k
-        # currentamp, _ = vector_2angles(self.direction)
-
-        # for i in range(k+1):
-        #     newamp = -self.max_amp + amp*i
-        #     dir = get_normalized_vector(angles_2vector(currentamp+newamp))
-        #     d.append((dir, euclidian_distance(dir, goal_dir)))
-        
-        # d.append((self.direction, euclidian_distance(self.direction, goal_dir)))
-        
+        if k%2!=0:
+            k-=1
         goal_dir = get_normalized_vector(self.goal_point - self.position)
 
         d = []
@@ -58,10 +47,12 @@ class UAV:
             newamp = -self.max_amp + amp*i
             newdir = get_normalized_vector(angles_2vector(currentamp+newamp))
             d.append((newdir, euclidian_distance(newdir, goal_dir)))
+            # d.append((newdir, euclidian_distance(newdir, self.direction)))
         
-        if k%2!=0:
-            d.append((self.direction, euclidian_distance(self.direction, goal_dir)))
-        
+        # if k%2!=0:
+        #     d.append((self.direction, euclidian_distance(self.direction, 0)))
+        d.append((goal_dir, 0))
+
         return d
 
 
