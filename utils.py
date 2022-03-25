@@ -108,8 +108,7 @@ def calc_measures(uav):
     deviation = longitude - euclidian_distance(uav.initial_position, uav.goal_point)
 
     # el número de giros tambien
-    turns = [deviation_angle(point, uav.history[i+1], uav.history[i+2]) for i, point in enumerate(uav.history) if i<len(uav.history)-2 and not collinear(point, uav.history[i+1], uav.history[i+2])]
-    number_of_turns = sum(turns)
+    turns = [abs(deviation_angle(point, uav.history[i+1], uav.history[i+2])) for i, point in enumerate(uav.history) if i<len(uav.history)-2 and not collinear(point, uav.history[i+1], uav.history[i+2])]
 
     # el maximo giro tambien
     if turns:
@@ -124,15 +123,16 @@ def calc_measures(uav):
     # velocity_variation = sum([sqrt(uav.history[i].speed**2 - uav.history[i+1].speed**2) for i, point in enumerate(uav.history) if i<len(uav.history)-1])
     velocity_variation = 0
     # m3
-    m3 = number_of_turns
+    m3 = len(turns)
     # m4
     # d = lambda p1, p2, p3: asin(distance_from_line_2point(p1, p2, p3)/euclidian_distance(p2,p3))
     # angles_sum = sum([abs(d(point, uav.history[i+1], uav.history[i+2])) for i, point in enumerate(uav.history) if i<len(uav.history)-2 and not collinear(point, uav.history[i+1], uav.history[i+2])])
-    angles_sum=0
+    angles_sum=sum(turns)
     return {
         "longitude": longitude, 
         "deviation": deviation, 
-        "number_of_turns": number_of_turns, 
+        "turns": turns, 
+        "turns_sum": sum(turns), 
         "max_turn": max_turn, 
         "m1": flight_time, 
         "m2": velocity_variation,

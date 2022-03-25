@@ -34,7 +34,7 @@ class UAV:
 
 
 
-    def generate_directions(self, k):
+    def generate_directions(self, k, stop_cost = None):
         
         if k%2!=0:
             k-=1
@@ -46,15 +46,33 @@ class UAV:
         for i in range(k+1):
             newamp = -self.max_amp + amp*i
             newdir = get_normalized_vector(angles_2vector(currentamp+newamp))
-            d.append((newdir, euclidian_distance(newdir, goal_dir)))
+            cost = euclidian_distance(newdir, goal_dir)
+            d.append((newdir, cost))
+            d.append((newdir/4, cost+1))
             # d.append((newdir, euclidian_distance(newdir, self.direction)))
         
         # if k%2!=0:
         #     d.append((self.direction, euclidian_distance(self.direction, 0)))
         d.append((goal_dir, 0))
+        d.append((goal_dir/4, 1))
+
+        if stop_cost:
+            d.append((np.array([0, 0]), stop_cost))
 
         return d
 
+    def __str__(self) -> str:
+        
+        string = f''' DRONE PROPERTIES
+                postion: {self.position}\n
+                speed: {self.speed}                
+                radio: {self.radio}                
+                direction: {self.direction}                
+                goal: {self.goal_point}                
+                max_amp: {self.max_amp}                
+            '''
+
+        return string 
 
 if __name__ == "__main__":
 

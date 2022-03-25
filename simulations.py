@@ -39,7 +39,7 @@ def simulate(uavs, k, ca_timerange, timestep, max_iterations=10**5):
         for uav in flying_uavs:
             uav.fly(timestep)
             if not uav.is_in_goal:
-                # uav.direction = get_normalized_vector(uav.goal_point - uav.position)
+                uav.direction = get_normalized_vector(uav.goal_point - uav.position)
                 aux.append(uav)
 
 

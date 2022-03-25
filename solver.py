@@ -1,4 +1,5 @@
 import random
+import time
 
 from utils import *
 
@@ -6,7 +7,23 @@ from utils import *
 ## Resolve collision during a timestep
 def resolve_collision(uavs, k, timestep):
     directions_list = [uav.generate_directions(k) for uav in uavs]
-    return __solve__(uavs, directions_list, timestep)
+    # # For having 0,0 velocity
+    # directions_list = [uav.generate_directions(k,stop_cost=1000) for uav in uavs]
+    response = __solve__(uavs, directions_list, timestep)
+    if response == None:
+        name = "".join(str(time.time()).split("."))
+        with open(f"collision_{name}", "w+") as f:
+            count = 1
+            for u, d in zip(uavs,directions_list):
+                f.write(f"Drone: {count}")
+                f.write(str(u))
+                f.write("\n")
+                f.write(str(d))
+                f.write("\n")
+                f.write("\n")
+                count+=1
+                
+    return response
 
 
 def __solve__(uavs, directions_list, timestep):
@@ -66,8 +83,8 @@ def solve_brute_force_recursive2(uavs, directions_list, timestep, index, result)
                 continue
 
             new_cost = cost + c
-            if opt_cost == None or new_cost < opt_cost:#  or \
-                # (new_cost == opt_cost and random.uniform(0, 1) < 0.5):
+            if opt_cost == None or new_cost < opt_cost  or \
+                (new_cost == opt_cost and random.uniform(0, 1) < 0.5):
                     opt = optimal_result[:]
                     opt_cost = new_cost
     
