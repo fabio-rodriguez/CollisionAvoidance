@@ -7,6 +7,9 @@ from numpy.linalg import norm
 
 # Dist from line between points p1 and p2, to point p3
 def distance_from_line_2point(p1, p2, p3):
+    # p1 = p1.astype(float)
+    # p2 = p2.astype(float)
+    # p3 = p3.astype(float)
     den = 10**-10 if norm(p2-p1) == 0 else norm(p2-p1)
     return norm(np.cross(p2-p1, p1-p3)) / den
 
@@ -34,22 +37,42 @@ def deviation_angle(p0, p1, p2, epsilon=1e-8):
 def collide(uav1, d1, uav2, d2, timestep):
     ## The first must be the slower
     uav1, d1, uav2, d2 = (uav1, d1, uav2, d2) if uav1.speed < uav2.speed else (uav2, d2, uav1, d1)
-    # print(d2*uav2.speed, d1*uav1.speed)
     diffvector = d2*uav2.speed - d1*uav1.speed
-    p2 = uav2.position + diffvector
+    ## New position for faster vehicle
+    p2 = uav2.position + diffvector*timestep
     cat1 = distance_from_line_2point(uav2.position, p2, uav1.position) 
     
-    if cat1 < (uav1.radio + uav2.radio):
-        hip = euclidian_distance(uav1.position, uav2.position)
-        try:
-            cat2 = sqrt(hip**2 - cat1**2)
-        except:
-            cat2 = 0
+    radialdist = (uav1.radio + uav2.radio)
+    if cat1 < radialdist:
+        hip = euclidian_distance(uav2.position, uav1.position)        
+        col_dist = sqrt(hip**2 - cat1**2)
 
-        return cat2 < vector_norm(diffvector)*timestep
+        resp, point_near_goal = point_mindist_to_goal(uav2, d2) 
+        final_point = uav2.position + diffvector*timestep 
+
+        if resp and euclidian_distance(point_near_goal, uav2.position) < col_dist and euclidian_distance(point_near_goal, uav1.position) > radialdist:
+            return False   
+        if euclidian_distance(final_point, uav2.position) < col_dist and euclidian_distance(final_point, uav1.position) > radialdist:
+            return False
+
+        return True
     
     return False
 
+
+def point_mindist_to_goal(uav, d):
+    new_pos = uav.position + uav.speed*d
+    
+    ## Distance from P3 to line between P1 and P2
+    p1, p2, p3 = uav.position, new_pos, uav.goal_point
+    dist = distance_from_line_2point(p1, p2, p3)
+    if dist < uav.goal_distance:
+        hip = euclidian_distance(p1, p3)
+        displacement = sqrt(hip**2 - dist**2)
+        time = displacement/(uav.speed*sum(d**2))
+        return 1, p1+d*uav.speed*time
+    else:
+        return 0, None        
 
 # Detect if two uavs in the list collide 
 def list_collide(uavs, directions, timestep):
@@ -139,3 +162,7 @@ def calc_measures(uav):
         "m3": m3,
         "m4": angles_sum
     }
+
+
+def angle_in_range(alpha, lower, upper):
+    return (alpha - lower) % (2*pi) <= (upper - lower) % (2*pi)

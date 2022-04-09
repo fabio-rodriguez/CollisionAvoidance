@@ -2,13 +2,19 @@ import json
 import numpy as np
 import os
 
-from sklearn.metrics import euclidean_distances
-
 from classes import UAV
 from utils import euclidian_distance, get_normalized_vector, plot_history
 from math import *
 from simulations import simulate
 
+
+K_DIR = 7
+TIMESTEP = 0.25
+TIMERANGE = 10
+SPEED = 1.5
+SPEEDRATE = 20
+RADIO = 1.5
+MAXAMPLITUDE=radians(45)
 
 def test_experiment():
 
@@ -23,7 +29,7 @@ def test_experiment():
     plot_history([u1, u2, u3, u4])
 
 
-def experiment1(k=6, speed = 1.5, radio = 0.5, timestep=0.25, ca_timerange=10):
+def experiment1(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_timerange=TIMERANGE):
     ''' 6 drones antipodales'''
 
     drone_positions = []
@@ -34,15 +40,21 @@ def experiment1(k=6, speed = 1.5, radio = 0.5, timestep=0.25, ca_timerange=10):
 
     goals = [(-x, -y) for x,y in drone_positions]
 
+    SPEEDRATE = defining_speedrate(drone_positions, goals)
+    print("speedrate:", SPEEDRATE)
+
     uavs = []
     for position, goal in zip(drone_positions, goals):
         # For different speeds
-        speed = euclidian_distance(position, goal)/100
+        speed = euclidian_distance(position, goal)/SPEEDRATE
 
         direction = get_normalized_vector(np.array(goal)-np.array(position))
-        uav = UAV(position, speed, radio, direction, goal, goal_distance=0.5, max_amp=radians(60))
+        uav = UAV(position, speed, radio, direction, goal, goal_distance=0.5, max_amp=MAXAMPLITUDE)
         uavs.append(uav)
     
+    timestep = defining_timestep(uavs)
+    print(timestep)
+
     measures = simulate(uavs, k, ca_timerange, timestep)
     with open("results/experiments1.json", "w") as f:
         f.write(json.dumps(measures))
@@ -50,18 +62,28 @@ def experiment1(k=6, speed = 1.5, radio = 0.5, timestep=0.25, ca_timerange=10):
     plot_history(uavs, name="results/experiments1")
 
 
-def experiment2(k=6, speed = 1.5, radio = 0.5, timestep=0.25, ca_timerange=10):
+def experiment2(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_timerange=TIMERANGE):
     ''' 5 drones down to up'''
 
     drone_positions = [(-8, -8), (-4, -8), (0, -8), (4, -8), (8, -8)]    
     goals = [(8, 8), (4, 8), (-4, 8), (-8, 8), (0, 8)]
 
+    SPEEDRATE = defining_speedrate(drone_positions, goals)
+    print("speedrate:", SPEEDRATE)
+
     uavs = []
     for position, goal in zip(drone_positions, goals):
+        # For different speeds
+        # speed = euclidian_distance(position, goal)/SPEEDRATE
+
         direction = get_normalized_vector(np.array(goal)-np.array(position))
-        uav = UAV(position, speed, radio, direction, goal, goal_distance=0.5, max_amp=radians(60))
+        uav = UAV(position, speed, radio, direction, goal, goal_distance=0.5, max_amp=MAXAMPLITUDE)
         uavs.append(uav)
     
+    
+    # timestep = defining_timestep(uavs)
+    # print(timestep)
+
     measures = simulate(uavs, k, ca_timerange, timestep)
     print(measures)
     with open("results/experiments2.json", "w") as f:
@@ -70,18 +92,28 @@ def experiment2(k=6, speed = 1.5, radio = 0.5, timestep=0.25, ca_timerange=10):
     plot_history(uavs, name="results/experiments2")
 
 
-def experiment3(k=6, speed = 1.5, radio = 0.5, timestep=0.25, ca_timerange=10):
+def experiment3(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_timerange=TIMERANGE):
     '6agentes_esc4'
 
     drone_positions = [(0, 0), (10, 0), (15, 2), (15, -2), (20, 4), (20, -4)]    
     goals = [(40, 0), (0, 0), (0, -2), (0, 2), (0, -4), (0, 4)]
 
+    SPEEDRATE = defining_speedrate(drone_positions, goals)
+    print("speedrate:", SPEEDRATE)
+
     uavs = []
     for position, goal in zip(drone_positions, goals):
+        # For different speeds
+        # speed = euclidian_distance(position, goal)/SPEEDRATE
+
         direction = get_normalized_vector(np.array(goal)-np.array(position))
-        uav = UAV(position, speed, radio, direction, goal, goal_distance=0.5, max_amp=radians(60))
+        uav = UAV(position, speed, radio, direction, goal, goal_distance=0.5, max_amp=MAXAMPLITUDE)
         uavs.append(uav)
     
+    
+    # timestep = defining_timestep(uavs)
+    # print(timestep)
+
     measures = simulate(uavs, k, ca_timerange, timestep)
     with open("results/experiments3.json", "w") as f:
         f.write(json.dumps(measures))
@@ -89,7 +121,7 @@ def experiment3(k=6, speed = 1.5, radio = 0.5, timestep=0.25, ca_timerange=10):
     plot_history(uavs, name="results/experiments3")
 
 
-def experiment4(k=6, speed = 1.5, radio = 0.5, timestep=0.25, ca_timerange=10):
+def experiment4(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_timerange=TIMERANGE):
     ''' 5 drones antipodal alternando '''
     
     drone_positions = []    
@@ -102,12 +134,21 @@ def experiment4(k=6, speed = 1.5, radio = 0.5, timestep=0.25, ca_timerange=10):
             
             goals.append((-position[0], -position[1]))
     
+    SPEEDRATE = defining_speedrate(drone_positions, goals)
+    print("speedrate:", SPEEDRATE)
+
     uavs = []
     for position, goal in zip(drone_positions, goals):
+        # For different speeds
+        speed = euclidian_distance(position, goal)/SPEEDRATE
+
         direction = get_normalized_vector(np.array(goal)-np.array(position))
-        uav = UAV(position, speed, radio, direction, goal, goal_distance=0.5, max_amp=radians(60))
+        uav = UAV(position, speed, radio, direction, goal, goal_distance=0.5, max_amp=MAXAMPLITUDE)
         uavs.append(uav)
     
+    timestep = defining_timestep(uavs)
+    print(timestep)
+
     measures = simulate(uavs, k, ca_timerange, timestep)
     print(measures)
     with open("results/experiments4.json", "w") as f:
@@ -116,12 +157,16 @@ def experiment4(k=6, speed = 1.5, radio = 0.5, timestep=0.25, ca_timerange=10):
     plot_history(uavs, name="results/experiments4")
 
 
-def random_experiments(k=6, speed = 1.5, radio = 0.5, timestep=0.25, ca_timerange=10, max_amp=radians(60)):
+def random_experiments(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_timerange=TIMERANGE, max_amp=MAXAMPLITUDE):
     
     cwd = os.getcwd()
 
     f = open("results/random_results.json", "w")
     f.close()
+
+    f = open("results/random_results.txt", "w")
+    f.close()
+
 
     allfiles = [f for f in os.listdir(f'{cwd}/data') if os.path.isfile(os.path.join(f'{cwd}/data', f)) if f.endswith(".txt")]
     results = {}
@@ -152,12 +197,22 @@ def random_experiments(k=6, speed = 1.5, radio = 0.5, timestep=0.25, ca_timerang
         drone_positions.pop(-1)
         goal_positions.pop(-1)
 
+        SPEEDRATE = defining_speedrate(drone_positions, goal_positions)
+        print("speedrate:", SPEEDRATE)
+        
         uavs = []
         for position, goal in zip(drone_positions, goal_positions):
+            # For different speeds
+            speed = euclidian_distance(position, goal)/SPEEDRATE
+
             direction = get_normalized_vector(np.array(goal)-np.array(position))
             uav = UAV(position, speed, radio, direction, goal, goal_distance=1, max_amp=max_amp)
             uavs.append(uav)
         
+        
+        timestep = defining_timestep(uavs)
+        print(timestep)
+
         measures = simulate(uavs, k, ca_timerange, timestep)
 
         if not measures:
@@ -177,15 +232,52 @@ def random_experiments(k=6, speed = 1.5, radio = 0.5, timestep=0.25, ca_timerang
     with open("results/random_results.json", "w") as f:
         f.write(json.dumps(results))
 
-            
+
+def defining_timestep(uavs):
+    
+    dists = [euclidian_distance(uav.goal_point, uav.position) for uav in uavs]
+    # dists = [euclidian_distance(uav.goal_point, uav.position)/uav.speed for uav in uavs]
+    # return min(dists)/max(dists) ***
+    # return 2*min(dists)/max(dists) ***
+    # return 3*min(dists)/max(dists)
+    
+    if min(dists) == max(dists):
+        return 1
+    else:
+        if 3*min(dists)/max(dists) < 1:
+            return 5*min(dists)/max(dists)
+        else:
+            return 3*min(dists)/max(dists)/2
+        
+        # return 3*min(dists)/max(dists)/2 # ***** 
+        
+
+def defining_speedrate(position, goals):
+    
+    dists = [euclidian_distance(p, g) for p, g in zip(position, goals)]
+    res = max((max(dists)/min(dists))**2, 20)
+    # return min(res, 40)    
+    # return 15
+    if (max(dists)/min(dists))>3:
+        return (max(dists)/min(dists))**2
+    else:
+        return 2*(max(dists)/min(dists))*10
+
+# ## for exp 2, 3: 
+# speedrate = 15
+# timestep = 3*min(dists)/max(dists)/2
+
+# speedrate = 15
+# timestep = min(dists)/max(dists)/2
+
 if __name__ == "__main__":
 
     # test_experiment()
 
-    experiment1()
+    # experiment1()
 
-    print("****Experimento 1 terminado****")
-    print()
+    # print("****Experimento 1 terminado****")
+    # print()
 
     experiment2()
 

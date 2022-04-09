@@ -17,6 +17,7 @@ class UAV:
         ## Minimum distance to reach the goal
         self.goal_distance = goal_distance
 
+
     def fly(self, timestep):
         new_pos = self.position + timestep*self.speed*self.direction
 
@@ -24,14 +25,14 @@ class UAV:
         p1, p2, p3 = new_pos, self.position, self.goal_point
         cat1 = distance_from_line_2point(p1, p2, p3)
         cat2 = euclidian_distance(p1, p3)
-
-        self.position = new_pos
-        self.history.append(self.position)
-
-        if cat1 <= self.goal_distance and sqrt(cat1**2+cat2**2) <= self.speed*timestep:
+        
+        ## If it pass near goal position
+        if cat1 <= self.goal_distance+self.radio and sqrt(cat1**2+cat2**2) <= self.speed*timestep:
             self.is_in_goal = True
             self.history.append(self.goal_point)
-
+        else:
+            self.position = new_pos
+            self.history.append(self.position)
 
 
     def generate_directions(self, k, stop_cost = None):
@@ -43,23 +44,33 @@ class UAV:
         d = []
         amp = 2*self.max_amp/k
         currentamp, _ = vector_2angles(self.direction)
+        togoal = True
         for i in range(k+1):
             newamp = -self.max_amp + amp*i
             newdir = get_normalized_vector(angles_2vector(currentamp+newamp))
             cost = euclidian_distance(newdir, goal_dir)
             d.append((newdir, cost))
-            d.append((newdir/4, cost+1))
+            # d.append((newdir/4, cost+1))
             # d.append((newdir, euclidian_distance(newdir, self.direction)))
+            if goal_dir[0] == newdir[0] and goal_dir[1] == newdir[1]:
+                togoal = False
         
         # if k%2!=0:
         #     d.append((self.direction, euclidian_distance(self.direction, 0)))
-        d.append((goal_dir, 0))
-        d.append((goal_dir/4, 1))
+        goalamp, _ = vector_2angles(goal_dir)
+        if togoal and angle_in_range(currentamp-self.max_amp, currentamp+self.max_amp, goalamp):
+        # if togoal:
+            d.append((goal_dir, 0))
+        
+        # d.append((goal_dir, 0))
 
-        if stop_cost:
-            d.append((np.array([0, 0]), stop_cost))
+
+        # if stop_cost:
+        #     d.append((goal_dir/5, stop_cost))
+            # d.append((np.array([0, 0]), stop_cost))
 
         return d
+
 
     def __str__(self) -> str:
         
@@ -74,19 +85,20 @@ class UAV:
 
         return string 
 
-if __name__ == "__main__":
-
-    from math import atan2, degrees
-
-    #  [(array([0.94341668, 0.33160966]), 0.04702048877028444), 
-    # (array([0.72697622, 0.68666264]), 0.36971546811559025), 
-    # (array([0.38483497, 0.9229854 ]), 0.7702930849531653), 
-    # (array([-0.02384775,  0.9997156 ]), 1.1372051977019704), 
-    # (array([-0.42840697,  0.9035859 ]), 1.454415986395225), 
-    # (array([-0.75889073,  0.65121798]), 1.7080618174207913)]
-    uav = UAV((-4.26866144, 11.6145004),1,0.5,(-0.71826272, -0.695772),(-8,8),max_amp=radians(60))
-
-    print(uav)
-    print(uav.generate_directions(5))
+    def copy(self):
+        uav = UAV((self.position[0], self.position[1]), self.speed, self.radio, (self.direction[0], self.direction[1]), self.goal_point)
+        return uav
 
 
+if __name__=="__main__":
+
+    uav1 = UAV((2.10904519, -0.52810635), 1.3333333333333333, 0.5, (-0.99905033, 0.04357113), (-10, 0), max_amp=0.7853981633974483)
+
+    uav2 = UAV((0.61803399, -1.90211303), 1.3333333333333333, 0.5, (-0.30901699, 0.95105652), (-3.09016994, 9.51056516), max_amp=0.7853981633974483)
+
+    print(collide(uav1, uav1.direction, uav2, uav2.direction, 3))
+
+    uav1.fly(1)
+    uav2.fly(1)
+
+    print(sum(((uav1.position-uav2.position)**2))**0.5)

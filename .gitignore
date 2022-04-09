@@ -133,3 +133,6 @@ dmypy.json
 
 #Folders
 comparison/
+collisions/
+results/
+data/
