@@ -5,6 +5,95 @@ from math import *
 from numpy.linalg import norm
 
 
+class Point:
+
+    def __init__(self, x: float, y: float) -> None:
+        self.x = x
+        self.y = y
+
+
+class Line:
+
+    def __init__(self, p1: Point, p2: Point) -> None:
+        if (p2.x-p1.x) != 0:
+            self.m = (p2.y-p1.y)/(p2.x-p1.x)
+            self.n = p1.y-p1.x*self.m
+        else:
+            self.m = float('inf')
+            self.n = float('inf')
+            self.xaxis = p1.x
+        
+    def f_x(self, x):
+        if self.m == float('inf'):  
+            return float('inf')
+        return self.m*x+self.n
+        
+    def f_y(self, y):
+        if self.m == float('inf'):  
+            return self.xaxis
+        return (y-self.n)/self.m
+
+
+
+class Circle:
+
+    def __init__(self, center: Point, radio: float) -> None:
+        self.center = center
+        self.a = center.x
+        self.b = center.y
+        self.radio = radio
+
+
+def collision_point_circle_line(circle: Circle, line: Line):
+    ## Circle: (x-a)**2+(y-b)**2=r**2
+    ## Line: y=mx+n
+
+    if line.m == float('inf'):
+        try:
+            n = sqrt(circle.radio**2 - (line.xaxis-circle.a)**2)
+            y1, y2 = n + circle.b, -n + circle.b
+            return Point(line.xaxis, y1), Point(line.xaxis, y2)
+        except:
+            return None  
+    else:
+        # (x-circle.a)**2+(line.m*x+line.n-circle.b)**2=circle.r**2
+        # x**2-2*circle.a*x+circle.a**2+line.m**2*x**2+2*line.m*x*(line.n-circle.b)+(line.n-circle.b)**2=circle.r**2
+        # (1+line.m**2)*x**2 + (-2*circle.a+2*line.m*(line.n-circle.b))*x + circle.a**2+(line.n-circle.b)**2-circle.r**2=0
+        a = 1+line.m**2
+        b = -2*circle.a+2*line.m*(line.n-circle.b)
+        c = circle.a**2+(line.n-circle.b)**2-circle.radio**2
+        res = discriminant(a, b, c)
+        if not res:
+            return None
+
+        try:
+            x1, x2 = res
+            return Point(x1, line.f_x(x1)), Point(x2, line.f_x(x2)) 
+        except:
+            return Point(res, line.f_x(res))    
+
+
+def discriminant(a,b,c):
+    D = b**2-4*a*c
+    if D<0:
+        return None
+    elif round(D,6) == 0:
+        return -b/(2*a)
+    else:
+        return (-b+sqrt(D))/(2*a), (-b-sqrt(D))/(2*a) 
+
+
+def detect_collision_point(point, dir, center, radio):
+    assert dir[0]!=0 or dir[1]!=0, "Please provided a valir direction"
+    
+    c = Circle(center, radio)
+    p1 = Point(point[0], point[1])
+    p2 = Point(point[0]+dir[0], point[1]+dir[1])
+    l = Line(p1, p2)
+
+    return collision_point_circle_line(c, l)
+
+
 # Dist from line between points p1 and p2, to point p3
 def distance_from_line_2point(p1, p2, p3):
     # p1 = p1.astype(float)
@@ -47,14 +136,26 @@ def collide(uav1, d1, uav2, d2, timestep):
         hip = euclidian_distance(uav2.position, uav1.position)        
         col_dist = sqrt(hip**2 - cat1**2)
 
-        resp, point_near_goal = point_mindist_to_goal(uav2, d2) 
+        ## If uav collision is after the timestep then there is not collsion until timestep
         final_point = uav2.position + diffvector*timestep 
-
-        if resp and euclidian_distance(point_near_goal, uav2.position) < col_dist and euclidian_distance(point_near_goal, uav1.position) > radialdist:
-            return False   
         if euclidian_distance(final_point, uav2.position) < col_dist and euclidian_distance(final_point, uav1.position) > radialdist:
             return False
 
+        ## If uav1 reaches goal before collision cuidado pq se mueveeeeee
+        # timegoal1 = point_mindist_to_goal(uav1, d1) 
+        # if timegoal1:
+        #     pos1 = uav1.position + timegoal1*uav1.speed*d1
+        #     if euclidian_distance(uav1.position, pos1) < col_dist and euclidian_distance(pos1, uav2.position)
+        #     return False
+        
+        ## If uav2 reaches goal before collision
+        ## TODO dist de linea a circlulo
+        timegoal2 = point_mindist_to_goal(uav2, d2) 
+        if timegoal2:
+            pos2 = uav2.position + timegoal2*uav2.speed*d2
+            if euclidian_distance(uav2.position, pos2) < col_dist and euclidian_distance(pos2, uav1.position) < radialdist:
+                return False
+                    
         return True
     
     return False
@@ -66,13 +167,11 @@ def point_mindist_to_goal(uav, d):
     ## Distance from P3 to line between P1 and P2
     p1, p2, p3 = uav.position, new_pos, uav.goal_point
     dist = distance_from_line_2point(p1, p2, p3)
-    if dist < uav.goal_distance:
+    if dist <= uav.goal_distance+uav.radio:
         hip = euclidian_distance(p1, p3)
         displacement = sqrt(hip**2 - dist**2)
-        time = displacement/(uav.speed*sum(d**2))
-        return 1, p1+d*uav.speed*time
-    else:
-        return 0, None        
+        time = displacement/(uav.speed*norm(d))
+        return time     
 
 # Detect if two uavs in the list collide 
 def list_collide(uavs, directions, timestep):
@@ -166,3 +265,7 @@ def calc_measures(uav):
 
 def angle_in_range(alpha, lower, upper):
     return (alpha - lower) % (2*pi) <= (upper - lower) % (2*pi)
+
+
+def time_from_displacement(dir, speed, displacement):
+    return displacement/(speed*norm(dir))

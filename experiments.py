@@ -85,7 +85,7 @@ def experiment2(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_tim
     # print(timestep)
 
     measures = simulate(uavs, k, ca_timerange, timestep)
-    print(measures)
+    # print(measures)
     with open("results/experiments2.json", "w") as f:
         f.write(json.dumps(measures))
 
@@ -284,18 +284,18 @@ if __name__ == "__main__":
     print("****Experimento 2 terminado****")
     print()
     
-    experiment3()
+    # experiment3()
 
-    print("****Experimento 3 terminado****")
-    print()
+    # print("****Experimento 3 terminado****")
+    # print()
     
-    experiment4()
+    # experiment4()
 
-    print("****Experimento 4 terminado****")
-    print()
+    # print("****Experimento 4 terminado****")
+    # print()
 
-    random_experiments()
+    # random_experiments()
     
-    print("****Random experiments terminados****")
-    print()
+    # print("****Random experiments terminados****")
+    # print()
     

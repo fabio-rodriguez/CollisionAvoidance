@@ -19,20 +19,44 @@ class UAV:
 
 
     def fly(self, timestep):
-        new_pos = self.position + timestep*self.speed*self.direction
+        ## WITH POINT TO LINE
+        # new_pos = self.position + timestep*self.speed*self.direction
 
-        ## Distance from P3 to line between P1 and P2
-        p1, p2, p3 = new_pos, self.position, self.goal_point
-        cat1 = distance_from_line_2point(p1, p2, p3)
-        cat2 = euclidian_distance(p1, p3)
+        # ## Distance from P3 to line between P1 and P2
+        # p1, p2, p3 = new_pos, self.position, self.goal_point
+        # cat1 = distance_from_line_2point(p1, p2, p3)
         
-        ## If it pass near goal position
-        if cat1 <= self.goal_distance+self.radio and sqrt(cat1**2+cat2**2) <= self.speed*timestep:
-            self.is_in_goal = True
-            self.history.append(self.goal_point)
-        else:
-            self.position = new_pos
-            self.history.append(self.position)
+        # cat2 = euclidian_distance(p1, p3)
+        
+        # ## If it pass near goal position
+        # if cat1 <= self.goal_distance+self.radio and sqrt(cat1**2+cat2**2) <= self.speed*timestep:
+        #     self.is_in_goal = True
+        #     self.history.append(self.goal_point)
+        # else:
+        #     self.position = new_pos
+        #     self.history.append(self.position)
+        
+        goal = Point(self.goal_point[0], self.goal_point[1])
+        res = detect_collision_point(self.position, self.direction, goal,self.goal_distance+self.radio)
+        try:
+            p1, p2 = res 
+            p1 = np.array([p1.x, p1.y])
+            p2 = np.array([p2.x, p2.y])
+            d1, d2 = euclidian_distance(self.position, p1), euclidian_distance(self.position, p2) 
+            near = p1 if d1 < d2 else p2
+        except:
+            near = None if res == None else np.array([res.x, res.y])
+
+        if not near is None:
+            time = time_from_displacement(self.direction, self.speed, euclidian_distance(self.position, near)) 
+            if time < timestep:
+                self.is_in_goal = True
+                self.history.append(self.goal_point)
+                return
+        
+        self.position = self.position +timestep*self.speed*self.direction 
+        self.history.append(self.position)
+    
 
 
     def generate_directions(self, k, stop_cost = None):
@@ -88,7 +112,6 @@ class UAV:
     def copy(self):
         uav = UAV((self.position[0], self.position[1]), self.speed, self.radio, (self.direction[0], self.direction[1]), self.goal_point)
         return uav
-
 
 if __name__=="__main__":
 

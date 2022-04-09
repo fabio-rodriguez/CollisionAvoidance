@@ -42,7 +42,17 @@ def simulate(uavs, k, ca_timerange, timestep, max_iterations=10**5):
         #         if currentamp-u.max_amp < goalamp < currentamp+u.max_amp:
         #             u.direction = d 
 
+
         new_directions, cost = resolve_collision(flying_uavs, k, ca_timerange)
+
+        # for i, uav in enumerate(flying_uavs):
+        #     if uav.position[0] < -5 and uav.position[1] > 5 and count < 50:
+        #         print(uav)
+        #         print(uav.generate_directions(k))
+        #         print("new direction:", new_directions[i])
+        #         print()  
+
+        
         if not new_directions:
             
             if list_collide(flying_uavs, current_dirs, ca_timerange):
