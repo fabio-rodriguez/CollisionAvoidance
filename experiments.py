@@ -284,15 +284,15 @@ if __name__ == "__main__":
     print("****Experimento 2 terminado****")
     print()
     
-    # experiment3()
+    experiment3()
 
-    # print("****Experimento 3 terminado****")
-    # print()
+    print("****Experimento 3 terminado****")
+    print()
     
-    # experiment4()
+    experiment4()
 
-    # print("****Experimento 4 terminado****")
-    # print()
+    print("****Experimento 4 terminado****")
+    print()
 
     # random_experiments()
     

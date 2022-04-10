@@ -7,9 +7,16 @@ from numpy.linalg import norm
 
 class Point:
 
-    def __init__(self, x: float, y: float) -> None:
+    def __init__(self, x: float = None, y: float = None) -> None:
         self.x = x
         self.y = y
+    
+    def point_from_array(self, array):
+        self.x = array[0]
+        self.y = array[1]
+    
+    def to_array(self):
+        return np.array([self.x, self.y])
 
 
 class Line:
@@ -83,7 +90,7 @@ def discriminant(a,b,c):
         return (-b+sqrt(D))/(2*a), (-b-sqrt(D))/(2*a) 
 
 
-def detect_collision_point(point, dir, center, radio):
+def detect_collision_point(point, dir, center: Point, radio):
     assert dir[0]!=0 or dir[1]!=0, "Please provided a valir direction"
     
     c = Circle(center, radio)
@@ -109,56 +116,93 @@ def collinear(p0, p1, p2, epsilon=1e-8):
     return abs(x1 * y2 - x2 * y1) < epsilon
 
 
-def deviation_angle(p0, p1, p2, epsilon=1e-8):
-    cat = distance_from_line_2point(p0, p1, p2)
-    hip = euclidian_distance(p1, p2)
-    try:
-        return abs(asin(cat/hip))
-    except:
-        print("******* ASIN ERROR *******")
-        print(cat, hip)
-        print()
-        return abs(asin(1))
-
-
-
 # Detect if uav1 with direction d1 collides with uav2 with direction d2
-def collide(uav1, d1, uav2, d2, timestep):
+def collide(uav1, d1, uav2, d2, timerange):
     ## The first must be the slower
     uav1, d1, uav2, d2 = (uav1, d1, uav2, d2) if uav1.speed < uav2.speed else (uav2, d2, uav1, d1)
-    diffvector = d2*uav2.speed - d1*uav1.speed
-    ## New position for faster vehicle
-    p2 = uav2.position + diffvector*timestep
-    cat1 = distance_from_line_2point(uav2.position, p2, uav1.position) 
     
+    # diffvector = d2*uav2.speed - d1*uav1.speed
+    # ## New position for faster vehicle
+    # p2 = uav2.position + diffvector*timestep
+    # cat1 = distance_from_line_2point(uav2.position, p2, uav1.position) 
+
+    # if cat1 < radialdist:
+    #     hip = euclidian_distance(uav2.position, uav1.position)        
+    #     col_dist = sqrt(hip**2 - cat1**2)
+
+    #     ## If uav collision is after the timestep then there is not collsion until timestep
+    #     final_point = uav2.position + diffvector*timestep 
+    #     if euclidian_distance(final_point, uav2.position) < col_dist and euclidian_distance(final_point, uav1.position) > radialdist:
+    #         return False
+
+    #     ## If uav1 reaches goal before collision cuidado pq se mueveeeeee
+    #     # timegoal1 = point_mindist_to_goal(uav1, d1) 
+    #     # if timegoal1:
+    #     #     pos1 = uav1.position + timegoal1*uav1.speed*d1
+    #     #     if euclidian_distance(uav1.position, pos1) < col_dist and euclidian_distance(pos1, uav2.position)
+    #     #     return False
+        
+    #     ## If uav2 reaches goal before collision
+    #     ## TODO dist de linea a circlulo
+    #     timegoal2 = point_mindist_to_goal(uav2, d2) 
+    #     if timegoal2:
+    #         pos2 = uav2.position + timegoal2*uav2.speed*d2
+    #         if euclidian_distance(uav2.position, pos2) < col_dist and euclidian_distance(pos2, uav1.position) < radialdist:
+    #             return False
+                    
+    #     return True
+
+
     radialdist = (uav1.radio + uav2.radio)
-    if cat1 < radialdist:
-        hip = euclidian_distance(uav2.position, uav1.position)        
-        col_dist = sqrt(hip**2 - cat1**2)
+    diffvector = d2*uav2.speed - d1*uav1.speed
+    assert diffvector[0]!=0 or diffvector[1]!=0,"The direction must be different from (0,0)"     
+    
+    center = Point()
+    center.point_from_array(uav1.position)
+    colpoint = detect_collision_point(uav2.position, diffvector, center, radialdist)
+    if colpoint is None:
+        return False
 
-        ## If uav collision is after the timestep then there is not collsion until timestep
-        final_point = uav2.position + diffvector*timestep 
-        if euclidian_distance(final_point, uav2.position) < col_dist and euclidian_distance(final_point, uav1.position) > radialdist:
-            return False
+    try:
+        p1, p2 = colpoint[0].to_array(), colpoint[1].to_array()
+        colpoint = p1 if euclidian_distance(uav2.position, p1) < euclidian_distance(uav2.position, p2) else p2
+    except:
+        colpoint = colpoint.to_array()
+    
+    coltime = time_from_displacement_wout_speed(diffvector, euclidian_distance(uav2.position, colpoint))
 
-        ## If uav1 reaches goal before collision cuidado pq se mueveeeeee
-        # timegoal1 = point_mindist_to_goal(uav1, d1) 
-        # if timegoal1:
-        #     pos1 = uav1.position + timegoal1*uav1.speed*d1
-        #     if euclidian_distance(uav1.position, pos1) < col_dist and euclidian_distance(pos1, uav2.position)
-        #     return False
+    if coltime < timerange:
+        
+        ## If uav1 reaches goal before collision
+        reach1 = reach_goal_before_time(uav1, d1, coltime)
         
         ## If uav2 reaches goal before collision
-        ## TODO dist de linea a circlulo
-        timegoal2 = point_mindist_to_goal(uav2, d2) 
-        if timegoal2:
-            pos2 = uav2.position + timegoal2*uav2.speed*d2
-            if euclidian_distance(uav2.position, pos2) < col_dist and euclidian_distance(pos2, uav1.position) < radialdist:
-                return False
-                    
-        return True
-    
+        reach2 = reach_goal_before_time(uav2, d2, coltime)
+        
+        if reach1 or reach2:
+            return False
+        
+        return True 
+
     return False
+
+
+def reach_goal_before_time(uav, dir, time):
+
+    center = Point()
+    center.point_from_array(uav.goal_point)
+    touchpoints = detect_collision_point(uav.position, dir, center, uav.radio+uav.goal_distance)    
+    if touchpoints is None:
+        return False
+    
+    try:
+        p1, p2 = touchpoints[0].to_array(), touchpoints[1].to_array()
+        colpoint = p1 if euclidian_distance(uav.position, p1) < euclidian_distance(uav.position, p2) else p2
+    except:
+        colpoint = touchpoints.to_array()
+    
+    coltime = time_from_displacement(dir,uav.speed,euclidian_distance(uav.position,colpoint))
+    return coltime < time
 
 
 def point_mindist_to_goal(uav, d):
@@ -221,6 +265,15 @@ def plot_history(uavs, name="default"):
     plt.close()
 
 
+def deviation_angle(p1,p2,p3):
+    c1 = distance_from_line_2point(p1,p2,p3)
+    h = euclidian_distance(p2,p3)
+    try:
+        return asin(c1/h) 
+    except:
+        print("Asin Error (cat, hip):", (c1, h))
+        return 0
+
 def calc_measures(uav):
     
     # La longitud de la trayectoria
@@ -269,3 +322,6 @@ def angle_in_range(alpha, lower, upper):
 
 def time_from_displacement(dir, speed, displacement):
     return displacement/(speed*norm(dir))
+
+def time_from_displacement_wout_speed(dir_with_speed, displacement):
+    return displacement/(norm(dir_with_speed))
