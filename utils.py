@@ -91,7 +91,7 @@ def discriminant(a,b,c):
 
 
 def detect_collision_point(point, dir, center: Point, radio):
-    assert dir[0]!=0 or dir[1]!=0, "Please provided a valir direction"
+    assert dir[0]!=0 or dir[1]!=0, "Please provided a valid direction"
     
     c = Circle(center, radio)
     p1 = Point(point[0], point[1])
@@ -155,8 +155,10 @@ def collide(uav1, d1, uav2, d2, timerange):
 
     radialdist = (uav1.radio + uav2.radio)
     diffvector = d2*uav2.speed - d1*uav1.speed
-    assert diffvector[0]!=0 or diffvector[1]!=0,"The direction must be different from (0,0)"     
-    
+    # If both directions are the same then there is no collision
+    if diffvector[0]==0 and diffvector[1]==0:
+        return False
+
     center = Point()
     center.point_from_array(uav1.position)
     colpoint = detect_collision_point(uav2.position, diffvector, center, radialdist)
@@ -201,8 +203,8 @@ def reach_goal_before_time(uav, dir, time):
     except:
         colpoint = touchpoints.to_array()
     
-    coltime = time_from_displacement(dir,uav.speed,euclidian_distance(uav.position,colpoint))
-    return coltime < time
+    goaltime = time_from_displacement(dir,uav.speed,euclidian_distance(uav.position,colpoint))
+    return goaltime < time
 
 
 def point_mindist_to_goal(uav, d):
@@ -274,6 +276,7 @@ def deviation_angle(p1,p2,p3):
         print("Asin Error (cat, hip):", (c1, h))
         return 0
 
+
 def calc_measures(uav):
     
     # La longitud de la trayectoria
@@ -307,12 +310,12 @@ def calc_measures(uav):
         "longitude": longitude, 
         "deviation": deviation, 
         "turns": turns, 
-        "turns_sum": sum(turns), 
         "max_turn": max_turn, 
-        "m1": flight_time, 
+        "m1: tiempo de vuelo": flight_time, 
         "m2": velocity_variation,
-        "m3": m3,
-        "m4": angles_sum
+        "m3: cant de giros": m3,
+        "m4: suma de angulos": angles_sum,
+        "angles_rate": 0 if not m3 else angles_sum/m3
     }
 
 
@@ -322,6 +325,7 @@ def angle_in_range(alpha, lower, upper):
 
 def time_from_displacement(dir, speed, displacement):
     return displacement/(speed*norm(dir))
+
 
 def time_from_displacement_wout_speed(dir_with_speed, displacement):
     return displacement/(norm(dir_with_speed))

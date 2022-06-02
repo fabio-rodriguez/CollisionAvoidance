@@ -47,7 +47,7 @@ class UAV:
         except:
             near = None if res == None else np.array([res.x, res.y])
 
-        if not near is None:
+        if not (near is None):
             time = time_from_displacement(self.direction, self.speed, euclidian_distance(self.position, near)) 
             if time < timestep:
                 self.is_in_goal = True
@@ -56,6 +56,9 @@ class UAV:
         
         self.position = self.position +timestep*self.speed*self.direction 
         self.history.append(self.position)
+
+        if euclidian_distance(self.position, self.goal_point) < (self.radio+self.goal_distance):
+            self.is_in_goal = True
     
 
 

@@ -9,21 +9,22 @@ from simulations import simulate
 
 
 K_DIR = 7
-TIMESTEP = 0.25
+TIMESTEP = 2
 TIMERANGE = 10
 SPEED = 1.5
 SPEEDRATE = 20
-RADIO = 1.5
-MAXAMPLITUDE=radians(45)
+RADIO = 1
+
+MAXAMPLITUDE=radians(60)
 
 def test_experiment():
 
-    u1 = UAV((-10, 0), 1, 1.5, (1, 0), (10, 0))
-    u2 = UAV((10, 0), 1, 1.5, (-1, 0), (-10, 0))
-    u3 = UAV((0, 10), 1, 1.5, (0, -1), (0, -10))
-    u4 = UAV((0, -10), 1, 1.5, (0, 1), (0, 10))
+    u1 = UAV((-20, 0), SPEED, RADIO, (1, 0), (0, 0),max_amp=MAXAMPLITUDE)
+    u2 = UAV((20, 0), SPEED, RADIO, (-1, 0), (0, 0),max_amp=MAXAMPLITUDE)
+    u3 = UAV((0, 20), SPEED, RADIO, (0, -1), (0, 0),max_amp=MAXAMPLITUDE)
+    u4 = UAV((0, -20), SPEED, RADIO, (0, 1), (0, 0),max_amp=MAXAMPLITUDE)
 
-    measures = simulate([u1, u2, u3, u4], 10, 6, 0.5)
+    measures = simulate([u1, u2, u3, u4],K_DIR,TIMERANGE,TIMESTEP)
     print(measures)
 
     plot_history([u1, u2, u3, u4])
@@ -34,26 +35,26 @@ def experiment1(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_tim
 
     drone_positions = []
     for i in range(6):
-        x = 50*cos(i*2*pi/6) 
-        y = 50*sin(i*2*pi/6) 
+        x = 15*cos(i*2*pi/6) 
+        y = 15*sin(i*2*pi/6) 
         drone_positions.append((x,y))
 
     goals = [(-x, -y) for x,y in drone_positions]
 
-    SPEEDRATE = defining_speedrate(drone_positions, goals)
-    print("speedrate:", SPEEDRATE)
+    # SPEEDRATE = defining_speedrate(drone_positions, goals)
+    # print("speedrate:", SPEEDRATE)
 
     uavs = []
     for position, goal in zip(drone_positions, goals):
         # For different speeds
-        speed = euclidian_distance(position, goal)/SPEEDRATE
+        # speed = euclidian_distance(position, goal)/SPEEDRATE
 
         direction = get_normalized_vector(np.array(goal)-np.array(position))
         uav = UAV(position, speed, radio, direction, goal, goal_distance=0.5, max_amp=MAXAMPLITUDE)
         uavs.append(uav)
     
-    timestep = defining_timestep(uavs)
-    print(timestep)
+    # timestep = defining_timestep(uavs)
+    # print(timestep)
 
     measures = simulate(uavs, k, ca_timerange, timestep)
     with open("results/experiments1.json", "w") as f:
@@ -68,8 +69,8 @@ def experiment2(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_tim
     drone_positions = [(-8, -8), (-4, -8), (0, -8), (4, -8), (8, -8)]    
     goals = [(8, 8), (4, 8), (-4, 8), (-8, 8), (0, 8)]
 
-    SPEEDRATE = defining_speedrate(drone_positions, goals)
-    print("speedrate:", SPEEDRATE)
+    # SPEEDRATE = defining_speedrate(drone_positions, goals)
+    # print("speedrate:", SPEEDRATE)
 
     uavs = []
     for position, goal in zip(drone_positions, goals):
@@ -98,8 +99,8 @@ def experiment3(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_tim
     drone_positions = [(0, 0), (10, 0), (15, 2), (15, -2), (20, 4), (20, -4)]    
     goals = [(40, 0), (0, 0), (0, -2), (0, 2), (0, -4), (0, 4)]
 
-    SPEEDRATE = defining_speedrate(drone_positions, goals)
-    print("speedrate:", SPEEDRATE)
+    # SPEEDRATE = defining_speedrate(drone_positions, goals)
+    # print("speedrate:", SPEEDRATE)
 
     uavs = []
     for position, goal in zip(drone_positions, goals):
@@ -134,23 +135,23 @@ def experiment4(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_tim
             
             goals.append((-position[0], -position[1]))
     
-    SPEEDRATE = defining_speedrate(drone_positions, goals)
-    print("speedrate:", SPEEDRATE)
+    # SPEEDRATE = defining_speedrate(drone_positions, goals)
+    # print("speedrate:", SPEEDRATE)
 
     uavs = []
     for position, goal in zip(drone_positions, goals):
         # For different speeds
-        speed = euclidian_distance(position, goal)/SPEEDRATE
+        # speed = euclidian_distance(position, goal)/SPEEDRATE
 
         direction = get_normalized_vector(np.array(goal)-np.array(position))
         uav = UAV(position, speed, radio, direction, goal, goal_distance=0.5, max_amp=MAXAMPLITUDE)
         uavs.append(uav)
     
-    timestep = defining_timestep(uavs)
-    print(timestep)
+    # timestep = defining_timestep(uavs)
+    # print(timestep)
 
     measures = simulate(uavs, k, ca_timerange, timestep)
-    print(measures)
+    # print(measures)
     with open("results/experiments4.json", "w") as f:
         f.write(json.dumps(measures))
 
@@ -194,24 +195,24 @@ def random_experiments(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP,
 
                 goal_positions.append((x,y))
 
-        drone_positions.pop(-1)
-        goal_positions.pop(-1)
+        drone_positions.pop()
+        goal_positions.pop()
 
-        SPEEDRATE = defining_speedrate(drone_positions, goal_positions)
-        print("speedrate:", SPEEDRATE)
+        # SPEEDRATE = defining_speedrate(drone_positions, goal_positions)
+        # print("speedrate:", SPEEDRATE)
         
         uavs = []
         for position, goal in zip(drone_positions, goal_positions):
             # For different speeds
-            speed = euclidian_distance(position, goal)/SPEEDRATE
+            # speed = euclidian_distance(position, goal)/SPEEDRATE
 
             direction = get_normalized_vector(np.array(goal)-np.array(position))
             uav = UAV(position, speed, radio, direction, goal, goal_distance=1, max_amp=max_amp)
             uavs.append(uav)
         
         
-        timestep = defining_timestep(uavs)
-        print(timestep)
+        # timestep = defining_timestep(uavs)
+        # print(timestep)
 
         measures = simulate(uavs, k, ca_timerange, timestep)
 
@@ -274,25 +275,25 @@ if __name__ == "__main__":
 
     # test_experiment()
 
-    # experiment1()
+    experiment1()
 
-    # print("****Experimento 1 terminado****")
+    print("****Experimento 1 terminado****")
+    print()
+
+    # experiment2()
+
+    # print("****Experimento 2 terminado****")
     # print()
-
-    experiment2()
-
-    print("****Experimento 2 terminado****")
-    print()
     
-    experiment3()
+    # experiment3()
 
-    print("****Experimento 3 terminado****")
-    print()
+    # print("****Experimento 3 terminado****")
+    # print()
     
-    experiment4()
+    # experiment4()
 
-    print("****Experimento 4 terminado****")
-    print()
+    # print("****Experimento 4 terminado****")
+    # print()
 
     # random_experiments()
     
