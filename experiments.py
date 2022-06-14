@@ -9,7 +9,7 @@ from simulations import simulate
 
 
 K_DIR = 7
-TIMESTEP = 2
+TIMESTEP = 0.25
 TIMERANGE = 10
 SPEED = 1.5
 SPEEDRATE = 20
@@ -35,8 +35,8 @@ def experiment1(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_tim
 
     drone_positions = []
     for i in range(6):
-        x = 15*cos(i*2*pi/6) 
-        y = 15*sin(i*2*pi/6) 
+        x = 10*cos(i*2*pi/6) 
+        y = 10*sin(i*2*pi/6) 
         drone_positions.append((x,y))
 
     goals = [(-x, -y) for x,y in drone_positions]
@@ -66,8 +66,8 @@ def experiment1(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_tim
 def experiment2(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_timerange=TIMERANGE):
     ''' 5 drones down to up'''
 
-    drone_positions = [(-8, -8), (-4, -8), (0, -8), (4, -8), (8, -8)]    
-    goals = [(8, 8), (4, 8), (-4, 8), (-8, 8), (0, 8)]
+    drone_positions = [(-9.5, -8), (-5, -8), (0, -8), (5, -8), (9.5, -8)]    
+    goals = [(9.5, 9), (5, 9), (-5.05, 8.9), (-9.5, 9), (0, 9)]
 
     # SPEEDRATE = defining_speedrate(drone_positions, goals)
     # print("speedrate:", SPEEDRATE)
@@ -97,7 +97,7 @@ def experiment3(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_tim
     '6agentes_esc4'
 
     drone_positions = [(0, 0), (10, 0), (15, 2), (15, -2), (20, 4), (20, -4)]    
-    goals = [(40, 0), (0, 0), (0, -2), (0, 2), (0, -4), (0, 4)]
+    goals = [(20, 0), (0, 0.05), (0, -4.05), (0.05, 4.05), (-0.05, -8.05), (0, 8.05)]
 
     # SPEEDRATE = defining_speedrate(drone_positions, goals)
     # print("speedrate:", SPEEDRATE)
