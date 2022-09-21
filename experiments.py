@@ -9,7 +9,7 @@ from simulations import simulate
 
 
 K_DIR = 7
-TIMESTEP = 0.25
+TIMESTEP = 2
 TIMERANGE = 10
 SPEED = 1.5
 SPEEDRATE = 20
@@ -56,11 +56,13 @@ def experiment1(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_tim
     # timestep = defining_timestep(uavs)
     # print(timestep)
 
-    measures = simulate(uavs, k, ca_timerange, timestep)
+    measures, mean_time = simulate(uavs, k, ca_timerange, timestep)
     with open("results/experiments1.json", "w") as f:
         f.write(json.dumps(measures))
 
     plot_history(uavs, name="results/experiments1")
+
+    return mean_time
 
 
 def experiment2(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_timerange=TIMERANGE):
@@ -85,13 +87,14 @@ def experiment2(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_tim
     # timestep = defining_timestep(uavs)
     # print(timestep)
 
-    measures = simulate(uavs, k, ca_timerange, timestep)
+    measures, mean_time = simulate(uavs, k, ca_timerange, timestep)
     # print(measures)
     with open("results/experiments2.json", "w") as f:
         f.write(json.dumps(measures))
 
     plot_history(uavs, name="results/experiments2")
 
+    return mean_time
 
 def experiment3(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_timerange=TIMERANGE):
     '6agentes_esc4'
@@ -115,12 +118,13 @@ def experiment3(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_tim
     # timestep = defining_timestep(uavs)
     # print(timestep)
 
-    measures = simulate(uavs, k, ca_timerange, timestep)
+    measures, mean_time = simulate(uavs, k, ca_timerange, timestep)
     with open("results/experiments3.json", "w") as f:
         f.write(json.dumps(measures))
 
     plot_history(uavs, name="results/experiments3")
 
+    return mean_time
 
 def experiment4(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_timerange=TIMERANGE):
     ''' 5 drones antipodal alternando '''
@@ -150,12 +154,14 @@ def experiment4(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_tim
     # timestep = defining_timestep(uavs)
     # print(timestep)
 
-    measures = simulate(uavs, k, ca_timerange, timestep)
+    measures, mean_time = simulate(uavs, k, ca_timerange, timestep)
     # print(measures)
     with open("results/experiments4.json", "w") as f:
         f.write(json.dumps(measures))
 
     plot_history(uavs, name="results/experiments4")
+
+    return mean_time
 
 
 def random_experiments(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_timerange=TIMERANGE, max_amp=MAXAMPLITUDE):
@@ -214,7 +220,7 @@ def random_experiments(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP,
         # timestep = defining_timestep(uavs)
         # print(timestep)
 
-        measures = simulate(uavs, k, ca_timerange, timestep)
+        measures, _ = simulate(uavs, k, ca_timerange, timestep)
 
         if not measures:
             print("COLLISION")
@@ -275,25 +281,29 @@ if __name__ == "__main__":
 
     # test_experiment()
 
-    experiment1()
+    t = experiment1()
 
     print("****Experimento 1 terminado****")
+    print(f"Iteration Time: Max = {max(t)}, Mean = {sum(t)/len(t)}")
     print()
 
-    # experiment2()
+    t = experiment2()
 
-    # print("****Experimento 2 terminado****")
-    # print()
+    print("****Experimento 2 terminado****")
+    print(f"Iteration Time: Max = {max(t)}, Mean = {sum(t)/len(t)}")
+    print()
     
-    # experiment3()
+    t = experiment3()
 
-    # print("****Experimento 3 terminado****")
-    # print()
+    print("****Experimento 3 terminado****")
+    print(f"Iteration Time: Max = {max(t)}, Mean = {sum(t)/len(t)}")
+    print()
     
-    # experiment4()
+    t = experiment4()
 
-    # print("****Experimento 4 terminado****")
-    # print()
+    print("****Experimento 4 terminado****")
+    print(f"Iteration Time: Max = {max(t)}, Mean = {sum(t)/len(t)}")
+    print()
 
     # random_experiments()
     

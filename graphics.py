@@ -130,12 +130,19 @@ if __name__=="__main__":
 
     # exp_5AA = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep0.25\5AA"
     # exp_6A = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep0.25\6A"
-    exp_6AAO = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep0.25\6AAO"
+    # exp_6AAO = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep0.25\6AAO"
     # exp_5DTU = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep0.25\5DTU"
-    orca_figures(exp_6AAO)
+    
+    # exp_5AA = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep2\5AA"
+    # exp_6A = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep2\6A"
+    # exp_6AAO = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep2\6AAO"
+    # exp_5DTU = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep2\5DTU"
+    
+    # orca_figures(exp_5DTU)
 
-    # exp_6A = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\radio 0.5\experiments1.json"
-    # exp_5DTU = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\radio 0.5\experiments2.json"
-    # exp_6AAO = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\radio 0.5\experiments3.json"
-    # exp_5AA = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\radio 0.5\experiments4.json"
-    # cank_figures(exp_6AAO)
+
+    # exp_6A = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\radio 1 ts 2s\experiments1.json"
+    # exp_5DTU = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\radio 1 ts 2s\experiments2.json"
+    # exp_6AAO = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\radio 1 ts 2s\experiments3.json"
+    exp_5AA = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\radio 1 ts 2s\experiments4.json"
+    cank_figures(exp_5AA)

@@ -41,6 +41,15 @@ def get_random_measures(path_to_folder, timestep):
             random_waypoints.append(waypoints)
 
 
+    # import matplotlib.pyplot as plt
+    # for i, rwps in enumerate(random_waypoints):
+    #     print(i)
+    #     for wps in rwps:
+    #         X,Y = zip(*wps)
+    #         plt.plot(X,Y)
+    #     plt.show()
+    #     plt.close()
+
     random_results = []
     for rwps in random_waypoints:
         dresults = {}
@@ -68,13 +77,17 @@ def get_random_measures(path_to_folder, timestep):
                         results[key] = [max(rr[key])]
                 
 
+    # values = [(i, value) for i, value in enumerate(results["deviation"]) if value>10]
+    # print(values)
+    # print(np.mean(results["deviation"]))
+    # print(np.std(results["deviation"]))
+
     for key in results.keys():
         # print(key, len(results[key]))
         if key != "turns":
             if key == "max_turn":
                 print(f"**{key}** {max(results[key])}")
             print(f"**{key}** mean: {np.mean(results[key])}, std {np.std(results[key])}")
-
 
 
 def calc_measures(waypoints, timestep):
@@ -175,14 +188,26 @@ def distance_from_line_2point(p1, p2, p3):
 
 if __name__=="__main__":
 
-    path_to_folder_5AA = "C:/Users/jmesca/Desktop/CollisionAvoidance/orca/TimeStep0.25/5AA"
-    path_to_folder_6A = "C:/Users/jmesca/Desktop/CollisionAvoidance/orca/TimeStep0.25/6A"
-    path_to_folder_6AAO = "C:/Users/jmesca/Desktop/CollisionAvoidance/orca/TimeStep0.25/6AAO"
-    path_to_folder_5DTU = "C:/Users/jmesca/Desktop/CollisionAvoidance/orca/TimeStep0.25/5DTU"
-    path_to_folder_randoms = "C:/Users/jmesca/Desktop/CollisionAvoidance/orca/TimeStep0.25/randoms"
+    # path_to_folder_5AA = "C:/Users/jmesca/Desktop/CollisionAvoidance/orca/TimeStep0.25/5AA"
+    # path_to_folder_6A = "C:/Users/jmesca/Desktop/CollisionAvoidance/orca/TimeStep0.25/6A"
+    # path_to_folder_6AAO = "C:/Users/jmesca/Desktop/CollisionAvoidance/orca/TimeStep0.25/6AAO"
+    # path_to_folder_5DTU = "C:/Users/jmesca/Desktop/CollisionAvoidance/orca/TimeStep0.25/5DTU"
+    # path_to_folder_randoms = "C:/Users/jmesca/Desktop/CollisionAvoidance/orca/TimeStep0.25/randoms"
+    
+    # path_to_folder_5AA = "C:/Users/jmesca/Desktop/CollisionAvoidance/orca/TimeStep2/5AA"
+    # path_to_folder_6A = "C:/Users/jmesca/Desktop/CollisionAvoidance/orca/TimeStep2/6A"
+    # path_to_folder_6AAO = "C:/Users/jmesca/Desktop/CollisionAvoidance/orca/TimeStep2/6AAO"
+    # path_to_folder_5DTU = "C:/Users/jmesca/Desktop/CollisionAvoidance/orca/TimeStep2/5DTU"
+    path_to_folder_randoms = "C:/Users/jmesca/Desktop/CollisionAvoidance/orca/TimeStep2/randoms"
 
     # get_measures(path_to_folder_5AA, 0.25)
     # get_measures(path_to_folder_6A, 0.25)
-    get_measures(path_to_folder_6AAO, 0.25)
+    # get_measures(path_to_folder_6AAO, 0.25)
     # get_measures(path_to_folder_5DTU, 0.25)
     # get_random_measures(path_to_folder_randoms, 0.25)
+
+    # get_measures(path_to_folder_5AA, 2)
+    # get_measures(path_to_folder_6A, 2)
+    # get_measures(path_to_folder_6AAO, 2)
+    # get_measures(path_to_folder_5DTU, 2)
+    get_random_measures(path_to_folder_randoms, 2)

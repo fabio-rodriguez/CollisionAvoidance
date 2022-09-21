@@ -97,11 +97,11 @@ def get_simple_measures(path):
 
 if __name__ == "__main__":
 
-    with open("random_results.txt", "r") as f:
-        s = f.read()
-        r = [eval(d) for d in s.split("\n")[:-1]]
+    # with open("random_results.txt", "r") as f:
+    #     s = f.read()
+    #     r = [eval(d) for d in s.split("\n")[:-1]]
 
-    measures = get_measures(r)  
+    # measures = get_measures(r)  
 
-    # path = "experiments4.json"
-    # get_simple_measures(path)
+    path = "experiments4.json"
+    get_simple_measures(path)

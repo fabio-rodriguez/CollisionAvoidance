@@ -10,7 +10,8 @@ def simulate(uavs, k, ca_timerange, timestep, max_iterations=10**5):
     count = 0
     no_solution = False
 
-    t = time.time()
+    tim_list = [] 
+    t_init = time.time()
     min_cost = 10**6
     max_iterations=10**3
     while flying_uavs and count<max_iterations:
@@ -42,8 +43,9 @@ def simulate(uavs, k, ca_timerange, timestep, max_iterations=10**5):
         #         if currentamp-u.max_amp < goalamp < currentamp+u.max_amp:
         #             u.direction = d 
 
-
+        t = time.time()
         new_directions, cost = resolve_collision(flying_uavs, k, ca_timerange)
+        tim_list.append(time.time()-t)
 
         # for i, uav in enumerate(flying_uavs):
         #     if uav.position[0] < -5 and uav.position[1] > 5 and count < 50:
@@ -84,19 +86,19 @@ def simulate(uavs, k, ca_timerange, timestep, max_iterations=10**5):
 
         count+=1
 
-    tf = time.time() - t
+    tf = time.time() - t_init
 
     measures = {i: calc_measures(uav) for i, uav in enumerate(uavs)}
     measures["waypoints"] = {i: {
         "X": [float(point[0]) for point in uav.history],
         "Y": [float(point[1]) for point in uav.history]
-        } for i, uav in enumerate(uavs)}
+    } for i, uav in enumerate(uavs)}
     measures["total_time"] = tf
     measures["min_cost"] = min_cost
 
     if no_solution:
         return None
 
-    return measures
+    return measures, tim_list
 
 
