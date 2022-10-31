@@ -1,4 +1,3 @@
-
 import json
 from locale import normalize
 import numpy as np
@@ -14,7 +13,7 @@ from simulations import simulate
 TIMESTEP = 0.25
 TIMERANGE = 10
 SPEED = 1.5
-RADIO = 1.5
+RADIO = 2.5
 
 MAXAMPLITUDE=radians(89.99)
 
@@ -63,6 +62,8 @@ def run_experiments(experiments, direction_number_set, timestep=TIMESTEP, ca_tim
 
     results = {}
     for index, drones in enumerate(experiments):
+        if index < 68:
+            continue
         results = {}
         for k in direction_number_set:
             uavs = [d.copy() for d in drones] 
@@ -145,13 +146,41 @@ def get_random_exps(from_exp=0, to_exp=100):
     return experiments
 
 
+def get_measures():
+    
+    with open("exp_article/random_results.json", "r") as f:
+        measures = json.loads(f.read())
+
+    results = {}
+    key_measures = list(measures[0][2].keys())
+    for k in measures[0].keys(): # for each value of k
+        results[k] = {}
+        for index in measures.keys():
+            for key in key_measures:
+                if index == 0:
+                    results[k][key] = [measures[index][k][key]]
+                else: 
+                    results[k][key].append(measures[index][k][key])
+
+    for k in measures[0].keys():
+        print(f"**{k}")
+        for key in key_measures:
+            measures_list = results[k][key]
+            print(f"{key}: mean = {np.mean(measures_list)}, std = {np.std(measures_list)}")
+        print()        
+    
 
 if __name__=="__main__":
 
-    # exps = create_random_exp(100, 5)
+    ## Create new experiments
+    # exps = create_random_exp(100, 5, 50, 50)
     # save_random_exps(exps)
 
+    ## Run experiments
     exps = get_random_exps()
-    direction_number_set = list(range(2,51))
-
+    direction_number_set = list(range(2, 21, 2))
     run_experiments(exps, direction_number_set)
+
+    ## Get measures from experiments
+    # get_measures()
+
