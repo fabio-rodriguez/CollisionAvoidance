@@ -3,6 +3,7 @@ from locale import normalize
 import numpy as np
 import os
 import random
+import matplotlib.pyplot as plt
 
 from classes import UAV
 from utils import euclidian_distance, get_normalized_vector, plot_history, vector_norm
@@ -13,7 +14,7 @@ from simulations import simulate
 TIMESTEP = 0.25
 TIMERANGE = 10
 SPEED = 1.5
-RADIO = 2.5
+RADIO = 1
 
 MAXAMPLITUDE=radians(89.99)
 
@@ -54,22 +55,44 @@ def run_experiments(experiments, direction_number_set, timestep=TIMESTEP, ca_tim
     
     # cwd = os.getcwd()
 
-    f = open("exp_article/random_results.json", "w")
-    f.close()
+    # f = open("exp_article/random_results.json", "w")
+    # f.close()
 
     f = open("exp_article/random_results.txt", "w")
     f.close()
 
-    results = {}
-    for index, drones in enumerate(experiments):
-        if index < 68:
-            continue
-        results = {}
-        for k in direction_number_set:
-            uavs = [d.copy() for d in drones] 
-            print(f"- Experiment {index}")
+    with open("exp_article/random_results.json", "r") as  f:
+        s = f.read()
+        if s:
+            results = json.loads(s)
+        else:
+            results = {}
 
-            measures, _ = simulate(uavs, k, ca_timerange, timestep)
+    for index, drones in enumerate(experiments):
+        
+        for k in direction_number_set:
+            if not k in results:
+                results[k] = {
+                    'longitude': [], 
+                    'deviation': [], 
+                    'turns': [], 
+                    'max_turn': [], 
+                    'm1: tiempo de vuelo': [], 
+                    'm2': [], 
+                    'm3: cant de giros': [], 
+                    'm4: suma de angulos': [], 
+                    'angles_rate': [],
+                    'waypoints': [],
+                    'total_time': [],
+                    'min_cost': [],
+                    "colls_solv_time": [],
+                    "collision": 0
+                }
+
+            uavs = [d.copy() for d in drones] 
+            print(f"- Experiment {index} -> k={k}")
+
+            measures, colls_solv_time = simulate(uavs, k, ca_timerange, timestep)
 
             if not measures:
                 measures = {"exp": index, "K": k, "collision": 1}
@@ -87,10 +110,18 @@ def run_experiments(experiments, direction_number_set, timestep=TIMESTEP, ca_tim
                 f.write(str(measures))
                 f.write("\n")
 
-            try: 
-                results[index][k] = measures
-            except:
-                results[index] = {k: measures}
+            for key in measures.keys():
+                if key in ["exp", "K"]:
+                    continue
+                elif key=="collision":
+                    results[k][key] += measures[key]         
+                elif key in [0,1,2,3,4]:
+                    for key2 in measures[key]: 
+                        results[k][key2].append(measures[key][key2])
+                else:
+                    results[k][key].append(measures[key])
+            
+            results[k]["colls_solv_time"] += [n for n in colls_solv_time if n > 0]
 
             plot_history(uavs, f'exp_article/pictures/{index}_{k}')
             
@@ -151,36 +182,102 @@ def get_measures():
     with open("exp_article/random_results.json", "r") as f:
         measures = json.loads(f.read())
 
-    results = {}
-    key_measures = list(measures[0][2].keys())
-    for k in measures[0].keys(): # for each value of k
-        results[k] = {}
-        for index in measures.keys():
-            for key in key_measures:
-                if index == 0:
-                    results[k][key] = [measures[index][k][key]]
-                else: 
-                    results[k][key].append(measures[index][k][key])
+    for k in measures.keys(): # for each value of k
+        print("**",k)
+        for key in measures[k]:  
+            if key in ['waypoints', 'total_time', 'turns']:
+                continue
+            if key == "collision":
+                print(f"No Solution Cases number: {measures[k][key]}")
+            else:
+                print(key, np.mean(measures[k][key]), np.std(measures[k][key]))
+                if key == "colls_solv_time":
+                    print("Number of collisions found", len(measures[k][key]))
+            
+        print()
+        
 
-    for k in measures[0].keys():
-        print(f"**{k}")
-        for key in key_measures:
-            measures_list = results[k][key]
-            print(f"{key}: mean = {np.mean(measures_list)}, std = {np.std(measures_list)}")
-        print()        
+def get_measures():
     
+    with open("exp_article/random_results.json", "r") as f:
+        measures = json.loads(f.read())
+
+    Ys = {}
+    for k in measures.keys(): # for each value of k
+        print("**",k)
+        for key in measures[k]:  
+
+            if key in ['waypoints', 'total_time', 'turns']:
+                continue
+
+            if not key in ["longitude", "m2", "min_cost", "m4: suma de angulos", "collision", "angles_rate"] \
+                and not key in Ys:
+                Ys[key] = []
+
+            if key == "collision":
+                try:
+                    Ys[key].append(measures[k][key])
+                except:
+                    pass
+                
+                print(f"No Solution Cases number: {measures[k][key]}")
+            else:
+                _mean = np.mean(measures[k][key])
+                try:
+                    Ys[key].append(_mean)
+                except:
+                    pass
+                
+                print(key, np.mean(_mean), np.std(measures[k][key]))
+                if key == "colls_solv_time":
+                    print("Number of collisions found", len(measures[k][key]))
+            
+        print()
+
+    labels = {
+        "deviation": "DEV", 
+        "m1: tiempo de vuelo": "TCT", 
+        "colls_solv_time": "CST", 
+        "max_turn": "MTA", 
+        "m3: cant de giros": "NOT",
+    } 
+    Xs = list(measures.keys())
+    for key in Ys.keys():
+        ymax = max(Ys[key])
+        y = np.array(Ys[key])/ymax
+
+        plt.plot(Xs, list(y), label=labels[key])
+
+    # plt.legend()
+    # box = plt.get_position()
+    # plt.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+    # Put a legend to the right of the current axis
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+    # plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.05),
+    #       ncol=3, fancybox=True, shadow=True)
+
+    plt.xlabel("Values of k")
+    plt.ylabel("Normalized Measures")
+    # plt.title("Study on k")
+    plt.savefig("test.png",bbox_inches='tight')
+    plt.show()
+
+    
+
 
 if __name__=="__main__":
 
     ## Create new experiments
-    # exps = create_random_exp(100, 5, 50, 50)
+    # exps = create_random_exp(50, 4, 28, 28)
     # save_random_exps(exps)
 
     ## Run experiments
     exps = get_random_exps()
-    direction_number_set = list(range(2, 21, 2))
+    direction_number_set = [20] #list(range(2, 21, 2))
     run_experiments(exps, direction_number_set)
 
     ## Get measures from experiments
-    # get_measures()
+    get_measures()
 
