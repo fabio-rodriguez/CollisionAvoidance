@@ -4,6 +4,9 @@ import numpy as np
 import os
 import random
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+
+from plotly.graph_objs import *
 
 from classes import UAV
 from utils import euclidian_distance, get_normalized_vector, plot_history, vector_norm
@@ -197,7 +200,7 @@ def get_measures():
         print()
         
 
-def get_measures():
+def draw_measures():
     
     with open("exp_article/random_results.json", "r") as f:
         measures = json.loads(f.read())
@@ -241,30 +244,149 @@ def get_measures():
         "max_turn": "MTA", 
         "m3: cant de giros": "NOT",
     } 
+
+    ## Plotting matplotlib
     Xs = list(measures.keys())
+    # for key in Ys.keys():
+    #     ymax = max(Ys[key])
+    #     y = np.array(Ys[key])/ymax
+
+    #     plt.plot(Xs, list(y), label=labels[key])
+
+    # # plt.legend()
+    # # box = plt.get_position()
+    # # plt.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+    # # Put a legend to the right of the current axis
+    # plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+    # # plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.05),
+    # #       ncol=3, fancybox=True, shadow=True)
+
+    # plt.xlabel("Values of k")
+    # plt.ylabel("Normalized Measures")
+    # # plt.title("Study on k")
+    # plt.savefig("test.png",bbox_inches='tight')
+    # plt.show()
+
+    layout = Layout(
+        margin=go.layout.Margin(
+            l=0,  # left margin
+            r=0,  # right margin
+            b=0,  # bottom margin
+            t=0,  # top margin
+        ),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        # xaxis=dict(mirror=True, ticks='outside', showline=True, linecolor = 'rgba(0,0,0,1)', gridcolor='rgba(0,0,0,1)', zerolinecolor='rgba(150,150,150,1)'),
+        # yaxis=dict(mirror=True, ticks='outside', showline=True, linecolor = 'rgba(0,0,0,1)', gridcolor='rgba(0,0,0,1)', zerolinecolor='rgba(150,150,150,1)'),
+        xaxis=dict(mirror=True, ticks='outside', showline=True, linecolor='rgba(0,0,0,1)'),
+        yaxis=dict(mirror=True, ticks='outside', showline=True, linecolor='rgba(0,0,0,1)'),
+    )
+
+    fig = go.Figure(layout=layout)
+    
     for key in Ys.keys():
         ymax = max(Ys[key])
         y = np.array(Ys[key])/ymax
 
-        plt.plot(Xs, list(y), label=labels[key])
+        fig.add_trace(
+            go.Scatter(x=Xs, y=list(y), mode = "lines", line=dict(width=6), showlegend=True, name=labels[key]))
 
-    # plt.legend()
-    # box = plt.get_position()
-    # plt.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+    # fig.add_trace(
+    #     go.Scatter(x=[0,250], y=[0,96.5], mode='markers', name="", line_color='rgba(255,0,0,1)', showlegend=False, marker_size=8))
 
-    # Put a legend to the right of the current axis
-    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    # fig.update_layout(legend=dict(x=0.708, y=1, traceorder="normal", font=dict(family="sans-serif",
+    #                                                                         size=16, color="black"), bgcolor="White",
+    #                             borderwidth=2))
+    fig.update_layout(showlegend=True)
 
-    # plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.05),
-    #       ncol=3, fancybox=True, shadow=True)
+    # ['solid', 'dot', 'dash', 'longdash', 'dashdot', 'longdashdot']
 
-    plt.xlabel("Values of k")
-    plt.ylabel("Normalized Measures")
-    # plt.title("Study on k")
-    plt.savefig("test.png",bbox_inches='tight')
-    plt.show()
+    # fig.update_layout(
+    #     autosize=False,
+    #     width=1000,
+    #     height=500,
+    #     )
+
+    # fig.update_yaxes(range=[-52, 2])
+    # fig.update_yaxes(autorange="reversed", zeroline=True, zerolinewidth=1, zerolinecolor='rgba(0,0,0,0.4)')
+
+    # fig.update_layout(xaxis_title="x(m)", yaxis_title="z(m)",
+    #                   font=dict(family="Courier New, monospace", size=18, color="Black"))
+    # fig.update_xaxes(range=[-2, 89])
+
+    fig.update_layout(
+        font_size = 35
+    )
+    
+    fig.update_xaxes(title_text='Values of k', title_standoff = 30)
+    fig.update_yaxes(title_text='Normalized Measures', title_standoff = 30)
+    fig.vshow()
 
     
+def draw_trajectories(exp=44):
+    
+    with open("exp_article/random_results.json", "r") as f:
+        measures = json.loads(f.read())
+
+    for k in measures.keys(): # for each value of k
+        print("**",k)
+
+        layout = Layout(
+            margin=go.layout.Margin(
+                l=0,  # left margin
+                r=0,  # right margin
+                b=0,  # bottom margin
+                t=0,  # top margin
+            ),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            # xaxis=dict(mirror=True, ticks='outside', showline=True, linecolor = 'rgba(0,0,0,1)', gridcolor='rgba(0,0,0,1)', zerolinecolor='rgba(150,150,150,1)'),
+            # yaxis=dict(mirror=True, ticks='outside', showline=True, linecolor = 'rgba(0,0,0,1)', gridcolor='rgba(0,0,0,1)', zerolinecolor='rgba(150,150,150,1)'),
+            xaxis=dict(mirror=True, ticks='outside', showline=True, linecolor='rgba(0,0,0,1)'),
+            yaxis=dict(mirror=True, ticks='outside', showline=True, linecolor='rgba(0,0,0,1)'),
+            showlegend=True,
+        )
+
+        fig = go.Figure(layout=layout)
+        
+        waypoints = measures[k]['waypoints'][exp] 
+        Xinit, Yinit = [], []
+        Xend, Yend = [], []
+        for wp in waypoints:
+            # plt.plot(waypoints[wp]["X"], waypoints[wp]["Y"])
+            # print(waypoints[wp])
+            fig.add_trace(
+                go.Scatter(x=waypoints[wp]["X"], y=waypoints[wp]["Y"], mode = "lines", line=dict(width=6), showlegend=False))
+            
+            Xinit.append(waypoints[wp]["X"][0])
+            Yinit.append(waypoints[wp]["Y"][0])
+            Xend.append(waypoints[wp]["X"][-1])
+            Yend.append(waypoints[wp]["Y"][-1])
+
+
+        fig.add_trace(
+                go.Scatter(x=Xinit, y=Yinit, mode = "markers", 
+                marker=dict(size=25, symbol="circle-dot",  line=dict(width=2, color="DarkSlateGrey")),
+                showlegend=True, name="Start Points"))
+
+        fig.add_trace(
+                go.Scatter(x=Xend, y=Yend, mode = "markers", 
+                marker=dict(size=25, symbol="x",  line=dict(width=2, color="DarkSlateGrey")),
+                showlegend=True, name="End Points"))
+
+        fig.update_layout(legend=dict(
+            font_size=40,
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=0.8
+        ))
+
+        fig.show()
+        # plt.show()
+        # print()    
 
 
 if __name__=="__main__":
@@ -274,10 +396,16 @@ if __name__=="__main__":
     # save_random_exps(exps)
 
     ## Run experiments
-    exps = get_random_exps()
-    direction_number_set = [20] #list(range(2, 21, 2))
-    run_experiments(exps, direction_number_set)
+    # exps = get_random_exps()
+    # direction_number_set = [20] #list(range(2, 21, 2))
+    # run_experiments(exps, direction_number_set)
 
     ## Get measures from experiments
-    get_measures()
+    # get_measures()
+    
+    ## Draw measures from experiments
+    # draw_measures()
+
+    ## Draw trajectories from experiments
+    draw_trajectories()
 

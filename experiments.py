@@ -8,14 +8,14 @@ from math import *
 from simulations import simulate
 
 
-K_DIR = 7
+K_DIR = 8
 TIMESTEP = 2
 TIMERANGE = 10
 SPEED = 1.5
 SPEEDRATE = 20
 RADIO = 1
 
-MAXAMPLITUDE=radians(60)
+MAXAMPLITUDE=radians(89.99)
 
 def test_experiment():
 
@@ -63,7 +63,6 @@ def experiment1(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_tim
     plot_history(uavs, name="results/experiments1")
 
     return mean_time
-
 
 def experiment2(k=K_DIR, speed = SPEED, radio = RADIO, timestep=TIMESTEP, ca_timerange=TIMERANGE):
     ''' 5 drones down to up'''
@@ -305,8 +304,8 @@ if __name__ == "__main__":
     print(f"Iteration Time: Max = {max(t)}, Mean = {sum(t)/len(t)}")
     print()
 
-    # random_experiments()
+    random_experiments()
     
-    # print("****Random experiments terminados****")
-    # print()
+    print("****Random experiments terminados****")
+    print()
     

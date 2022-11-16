@@ -54,6 +54,8 @@ def plot_waypoints(waypoints):
             b=0,  # bottom margin
             t=0,  # top margin
         ),
+        width=1000,
+        height=1000,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         # xaxis=dict(mirror=True, ticks='outside', showline=True, linecolor = 'rgba(0,0,0,1)', gridcolor='rgba(0,0,0,1)', zerolinecolor='rgba(150,150,150,1)'),
@@ -71,25 +73,58 @@ def plot_waypoints(waypoints):
     # fig.update_yaxes(showline=True, linewidth=2, linecolor='black', gridcolor='Red')
 
 
-    for wps, c in zip(waypoints, COLORS):
-
-        initx, inity = wps[0]
-        goalx, goaly = wps[-1]
+    # for wps, c in zip(waypoints, COLORS):
+    Xinit, Yinit = [], []
+    Xend, Yend = [], []
+    for wps in waypoints:
 
         wps=waypoint_cleaning(wps)
 
         Xs, Ys = zip(*wps)
 
-        fig.add_trace(
-            # go.Scatter(x=[initx], y=[inity], mode='markers', line_color='rgba(230,0,0,1)', name="Initial state", marker_size=11))
-            go.Scatter(x=[initx], y=[inity], mode='markers', line_color=c, marker_size=11, showlegend=False))
+        Xinit.append(Xs[0])
+        Yinit.append(Ys[0])
+        Xend.append(Xs[-1])
+        Yend.append(Ys[-1])
+
+        # fig.add_trace(
+        #     # go.Scatter(x=[initx], y=[inity], mode='markers', line_color='rgba(230,0,0,1)', name="Initial state", marker_size=11))
+        #     go.Scatter(x=[initx], y=[inity], mode='markers', line_color=c, marker_size=20, showlegend=False))
+
+        # fig.add_trace(
+        #     go.Scatter(x=[goalx], y=[goaly], mode='markers', marker_symbol="x", line_color=c, marker_size=20, showlegend=False))
 
         fig.add_trace(
-            go.Scatter(x=[goalx], y=[goaly], mode='markers', marker_symbol="x", line_color=c, marker_size=11, showlegend=False))
-
-        fig.add_trace(
-            go.Scatter(x=Xs, y=Ys, mode='lines, markers', line=dict(color=c,), line_width=3, showlegend=False))
+            go.Scatter(x=Xs, y=Ys, mode='lines, markers', marker_size=18, line_width=4, showlegend=False))
                                                                             # dash='dash'), name="OSPA", line_width=3))
+        
+    fig.add_trace(
+            go.Scatter(x=Xinit, y=Yinit, mode = "markers", marker=dict(
+                color='orange',
+                size=45,
+                line=dict(
+                    color='DarkSlateGrey',
+                    width=2
+                ),
+                symbol="circle-dot"
+            ),
+            showlegend=True, name="Start Points"))
+
+    fig.add_trace(
+            go.Scatter(x=Xend, y=Yend, mode = "markers", marker=dict(
+                color='LightSkyBlue',
+                size=45,
+                line=dict(
+                    color='DarkSlateGrey',
+                    width=2
+                ), 
+                symbol="x"
+            ),
+            showlegend=True, name="Start Points"))
+            # go.Scatter(x=Xend, y=Yend, mode = "markers", 
+            # marker=dict(size=25, symbol="x",  line=dict(width=2, color="DarkSlateGrey")),
+            # showlegend=True, name="End Points"))
+
         # fig.add_trace(
         #     go.Scatter(x=ann_Xs, y=ann_Zs, name="ANN prediction", mode='lines, markers', line_color='rgba(0,0,250,0.8)',
         #             line_width=3, ))
@@ -133,16 +168,25 @@ if __name__=="__main__":
     # exp_6AAO = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep0.25\6AAO"
     # exp_5DTU = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep0.25\5DTU"
     
-    # exp_5AA = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep2\5AA"
-    # exp_6A = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep2\6A"
-    # exp_6AAO = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep2\6AAO"
-    # exp_5DTU = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep2\5DTU"
-    
-    # orca_figures(exp_5DTU)
+    exp_5AA = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep2\5AA"
+    orca_figures(exp_5AA)
+    exp_6A = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep2\6A"
+    orca_figures(exp_6A)
+    exp_6AAO = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep2\6AAO"
+    orca_figures(exp_6AAO)
+    exp_5DTU = r"C:\Users\jmesca\Desktop\CollisionAvoidance\orca\TimeStep2\5DTU"
+    orca_figures(exp_5DTU)
 
+    # exp_6A = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\new max90 ts 025\experiments1.json"
+    # exp_5DTU = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\new max90 ts 025\experiments2.json"
+    # exp_6AAO = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\new max90 ts 025\experiments3.json"
+    # exp_5AA = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\new max90 ts 025\experiments4.json"
 
-    # exp_6A = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\radio 1 ts 2s\experiments1.json"
-    # exp_5DTU = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\radio 1 ts 2s\experiments2.json"
-    # exp_6AAO = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\radio 1 ts 2s\experiments3.json"
-    exp_5AA = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\radio 1 ts 2s\experiments4.json"
-    cank_figures(exp_5AA)
+    # exp_6A = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\new max90 ts 2\experiments1.json"
+    # cank_figures(exp_6A)
+    # exp_5DTU = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\new max90 ts 2\experiments2.json"
+    # cank_figures(exp_5DTU)
+    # exp_6AAO = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\new max90 ts 2\experiments3.json"
+    # cank_figures(exp_6AAO)
+    # exp_5AA = r"C:\Users\jmesca\Desktop\CollisionAvoidance\outputs\new max90 ts 2\experiments4.json"
+    # cank_figures(exp_5AA)
